@@ -1,0 +1,8 @@
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.shp filter=lfs diff=lfs merge=lfs -text
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.dbf filter=lfs diff=lfs merge=lfs -text
+data/shrug-shrid-poly-shp/shrid2_open.shp filter=lfs diff=lfs merge=lfs -text
+data/shrug-pca11-csv/pc11_pca_clean_shrid.csv filter=lfs diff=lfs merge=lfs -text
+data/shrug-shrid-poly-shp/shrid2_open.dbf filter=lfs diff=lfs merge=lfs -text
+data filter=lfs diff=lfs merge=lfs -text

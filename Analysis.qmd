@@ -1,0 +1,108 @@
+---
+title: "Analysis"
+author: "Aaditya Warrier"
+format: html
+editor: visual
+---
+
+
+```{r}
+library(foreign)
+library(tidyverse)
+library(sf)
+library(stringr)
+library(dukestm)
+shurg_shp <- st_read("data/shrug-shrid-poly-shp/shrid2_open.shp")
+shurg_sec <- st_read("data/shrug-pca11-csv/pc11_pca_clean_shrid.csv")
+shrug_subdist_shp <- st_read("data/shrug-pc11subdist-poly-shp/subdistrict.shp")
+
+shrug_dist_shp <- st_read("data/shrug-pc11dist-poly-shp/district.shp")
+```
+
+
+```{r}
+shurg_shp <- st_make_valid(shurg_shp)
+
+mumbai_shp <- shrug_dist_shp |>
+  filter(str_detect(d_name, "Mumbai"))
+
+
+mmr_shp <- shrug_subdist_shp |>
+  filter(pc11_s_id == "27" &
+           pc11_d_id %in% c(517, 520)) |>
+  filter(sd_name %in% c("Kalyan", "Bhiwandi", "Ulhasnagar", "Thane", "Panvel", "Vasai", "Virar", "Ambarnath", "Badlapur", "Karjat", "Khopoli", 
+                        "Uran", "Pen", "Alibag", "Dombivili")) |>
+  rename(d_name = sd_name) |>
+  select(-pc11_sd_id)
+
+full_mmr_shp <- st_make_valid(rbind(mumbai_shp, mmr_shp))
+```
+
+
+```{r}
+# delhi_shp <- shrug_subdist_shp |>
+#   filter(pc11_s_id == "07")
+# 
+# blr_shp <- shrug_dist_shp |>
+#   filter(str_detect(d_name, "Bangalore"))
+
+# 
+# delhi_shp |>
+#   ggplot() +
+#   geom_sf(fill = NA)
+# ints_delhi <- delhi_shp |>
+#   st_intersects(shurg_shp)
+# 
+# ints_blr <- blr_shp |>
+#   st_intersects(shurg_shp)
+# 
+# ints_blr2 <- blr_shp |>
+#   st_contains(shurg_shp)
+# 
+# delhi_shrid <- shurg_shp[unique(as.numeric(unlist(ints_delhi))), ] |>
+#   left_join(shurg_sec, by = "shrid2")
+# 
+# 
+# blr_shrid <- shurg_shp[unique(as.numeric(unlist(ints_blr))), ] |>
+#   left_join(shurg_sec, by = "shrid2")
+```
+
+
+
+
+```{r}
+ints <- full_mmr_shp |>
+  st_intersects(shurg_shp)
+
+
+mmr_shrid <- shurg_shp[unique(as.numeric(unlist(ints[3:13]))), ] |>
+  left_join(shurg_sec, by = "shrid2") |>
+  mutate(pc11_pca_p_sc = as.numeric(pc11_pca_p_sc),
+         pc11_pca_tot_p = as.numeric(pc11_pca_tot_p),
+         pc11_pca_p_st = as.numeric(pc11_pca_p_st)
+         ) 
+
+write_rds(mmr_shrid, "data/cleaned/mmr_shrid.rds")
+
+
+mmr_shrid |>
+  filter(shrid2 != "11-27-518-99999-802794") |>
+  mutate(sc_st_prop = (pc11_pca_p_sc + pc11_pca_p_st) / 
+                                  pc11_pca_tot_p) |>
+  ggplot() + 
+  geom_sf(aes(fill = sc_st_prop)) +
+  scale_fill_viridis_c()
+
+mmr_shrid_2 <- mmr_shrid |>
+  filter(shrid2 != "11-27-518-99999-802794")
+
+
+A = spdep::mat2listw(st_touches(mmr_shrid_2, sparse=FALSE), zero.policy = TRUE)
+
+spdep::moran.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_p_st) / 
+                                  mmr_shrid_2$pc11_pca_tot_p, A)
+
+ggplot(mmr_shrid_2, aes(x = sqrt((pc11_pca_p_sc + pc11_pca_p_st) / 
+                                  pc11_pca_tot_p))) +
+  geom_histogram()
+```

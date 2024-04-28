@@ -1,27 +1,116 @@
 ---
-title: "Final Report"
+title: "Caste-based and religious segregation in the Mumbai Metropolitan Region - a spatial model"
 author: "Aaditya Warrier"
-format: html
+bibliography: references.bib
+format: pdf
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+```{r setup, echo = FALSE, include = FALSE, warning=FALSE}
+library(tidyverse)
+library(sf)
+library(knitr)
 ```
 
-You can add options to executable code like this
+
+## 1. Introduction
+
+Mumbai, India's most populous city and its financial and commercial capital, is both its wealthiest city and its most diverse. The capital of the erstwhile Bombay Presidency, which at it its peak extended as far as present-day Sindh in Pakistan, the city has long been home to large ethnic minority communities, but was dominated by Maharashtrians and Gujaratis, who comprised a bulk of the 
+Other m
+
+Post-independence, however, the city was (and continues to be) shaped by waves of immigration from all over the country, exponentially growing its population and consequently its land area to accomodate these new residents. Large swathes of land to the north of the citysdf
+
+Mumbai is no stranger to expansion - indeed, the city owes its mere existence to land reclamation by the British - but 
+
+With these rapid changes have come ethnic tension,
+The existence of widespread discrimination in Mumbai's housing market has been well-established in the literature [], despite recent laws that have attempted to curb the practice. However, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper. The
+
+Real estate prices tend to decrease as one moves outward from the original island city
+
+## 2. Data 
+
+The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is the first s
+
+
+Into 576,158 shrids 
+
+[see @BHARATHI2023110951]
+
+### 2.1 Data Cleaning
+
+As SHRUG stores district/sub-district data separately from shrid-level data, with no linking variables between the two, finding the specific regions that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level districts or include very small portions of specific sub-districts. To solve this problem 
+
+As a result, some shrids are missing 
+
+the area of analysis may not perfectly correspond to every area of the MMR s
+
+note that all of the city proper is a single shrid - this s
+
+### 2.2 Exploration
+
+
+Table 1 presents a number of summary statistics for
 
 ```{r}
-#| echo: false
-2 * 2
+mmr_shrid <- readRDS("data/cleaned/mmr_shrid.rds")
+
+mmr_shrid |>
+  summarize(sc_pop = sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p),
+            st_pop = sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) |>
+  as_tibble() |>
+  select(-geometry) |>
+  kable(digits = 3)
+
+mmr_shrid |>
+  ggplot(aes(x = pc11_pca_p_st / pc11_pca_tot_p)) + 
+  geom_histogram(bins = 50)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+
+
+
+```{r echo = FALSE, warning=FALSE}
+
+mmr_shrid |>
+  # filter(shrid2 != ) |>
+  mutate(sc_st_prop = (pc11_pca_p_sc + pc11_pca_p_st) / 
+                                  pc11_pca_tot_p) |>
+  ggplot() + 
+  geom_sf(aes(fill = sc_st_prop), color = ifelse(mmr_shrid$shrid2 == "11-27-518-99999-802794", "red", NA)) +
+  scale_fill_viridis_c() + 
+  labs(fill = "Proportion of SC/ST residents")
+```
+
+Figure 1 displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is a single, large shrid, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move further from the city proper,
+
+This indicates 
+
+
+## 3. Methodology
+
+### 3.1 Primary Outcome
+
+The primary outcome of this study is the global spatial dissimilarity index.
+
+Significance will be tested using a pseudo-significance measure, computed on random permutation tests as described in Feitosa et. al [see @Feitosa_2007 pp 309-310]
+
+## 4. Results
+
+
+
+## 5. Discussion and Evaluation 
+
+
+## Appendix 
+
+https://www.freepressjournal.in/analysis/mumbai-naama-politicians-and-law-do-not-have-answers-to-mumbais-housing-discrimination
+
+https://link.springer.com/chapter/10.1007/978-3-030-64569-4_8#:~:text=The%20city%20is%20pervaded%20by,by%20class%2C%20caste%20and%20tribe.
+
+### References
+
+::: {#refs}
+:::
+
