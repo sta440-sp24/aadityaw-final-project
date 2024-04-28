@@ -1,5 +1,5 @@
 ---
-title: "Caste-based and religious segregation in the Mumbai Metropolitan Region - a spatial model"
+title: "Housing segregation in the Mumbai Metropolitan Region - a spatial model for caste-based discrimination"
 author: "Aaditya Warrier"
 bibliography: references.bib
 format: pdf
@@ -12,64 +12,78 @@ editor_options:
 library(tidyverse)
 library(sf)
 library(knitr)
+opts_chunk$set(warning = FALSE, echo = FALSE)
 ```
-
 
 ## 1. Introduction
 
-Mumbai, India's most populous city and its financial and commercial capital, is both its wealthiest city and its most diverse. The capital of the erstwhile Bombay Presidency, which at it its peak extended as far as present-day Sindh in Pakistan, the city has long been home to large ethnic minority communities, but was dominated by Maharashtrians and Gujaratis, who comprised a bulk of the 
-Other m
+Mumbai, India's financial and commercial capital, is both its wealthiest city and its most diverse. The current capital of Maharashtra and the former headquarters of the Bombay Presidency during British rule - which at its peak extended as far as present-day Sindh in Pakistan - the city has long been home to large minority communities, but was always dominated by Maharashtrians and Gujaratis, who comprised a bulk of the natives of the region. Post-independence, however, the city was (and continues to be) shaped by waves of immigration from across the state and the country, exponentially growing its population and consequently its urbanized area to accommodate these new residents. Large swathes of land to the north of the city, previously independent towns or villages, were annexed by administration, with sprawl oriented around the three major railway lines emanating from the historic city. Mumbai is no stranger to expansion - indeed, the city owes its mere existence to land reclamation by the British - but its scale and scope in the past few decades has been unprecedented. In 1951, the city covered 231.5 $km^2$ and housed 2.3 million people. By 2011, the city's metropolitan region (henceforth shortened as MMR) spanned 6,328 $km^2$ with 23.5 million people, with the city proper housing 12.2 million over a mere 603 $km^2$. Today, Maharashtrians and Gujaratis only make up 42% and 19% of the city's population respectively, the rest being natives of other states.
 
-Post-independence, however, the city was (and continues to be) shaped by waves of immigration from all over the country, exponentially growing its population and consequently its land area to accomodate these new residents. Large swathes of land to the north of the citysdf
+These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension.
 
-Mumbai is no stranger to expansion - indeed, the city owes its mere existence to land reclamation by the British - but 
+and combined with rising real estate prices, manifest in
 
-With these rapid changes have come ethnic tension,
-The existence of widespread discrimination in Mumbai's housing market has been well-established in the literature [], despite recent laws that have attempted to curb the practice. However, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper. The
+At the same time, real estate prices tend to decrease as one moves outward from the original island city
 
-Real estate prices tend to decrease as one moves outward from the original island city
+Daily commutes of three hours or more are common
 
-## 2. Data 
+The state was the center of the caste movement
 
-The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is the first s
+The existence of widespread discrimination in Mumbai's housing market has been well-established in the literature \[\], despite recent laws that have attempted to curb the practice. However, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper.
 
+Further, analysis conducted in other cities tend to utilize
 
-Into 576,158 shrids 
+This project aims to explore to what extent
 
 [see @BHARATHI2023110951]
 
+## 2. Data
+
+The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is an open access repository that aims to link hundreds of Indian datasets comprising socio-economic surveys, censuses, and environmental studies with common geographic identifiers. Owing to the nation's size and diversity, Indian record-keeping is notoriously inconsistent, with formats, naming conventions, and even languages often differing within the same state; SHRUG circumvents this issue through its standardization process. SHRUG also obtains a level of geographic granulality that cannot be found in any single government dataset - by splitting the nation into 576,153 uniform areal units termed "shrids" and reaggregating all variables to these, it provides a largely consistent framework by which to analyse different regions at a deeper level than states, districts and sub-districts. It is for this reason that the project utilizes **2011 Population Census Data** [credited to @pcindia; @almn2021] over more recent data like the National Family Health Survey from 2019-21 - cleaning the latter to a level acceptable for analysis would have been a months-long project, as it is not currently available in SHRUG. It would also not yield the granularity desired of areal data for spatial modelling.
+
+The 2011 Population Census data co
+
+Key variables of interest were the SC/ST population in each shrid and
+
 ### 2.1 Data Cleaning
 
-As SHRUG stores district/sub-district data separately from shrid-level data, with no linking variables between the two, finding the specific regions that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level districts or include very small portions of specific sub-districts. To solve this problem 
+As SHRUG stores district/sub-district data separately from shrid-level data, with no linking variables between the two, finding the specific shrids that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level districts or include very small portions of specific sub-districts. To rectify this problem as much as possible, I found the spatial intersection between most relevant districts and all shrids
 
-As a result, some shrids are missing 
+As a result, some areas of the MMR may be missing from the analy
 
 the area of analysis may not perfectly correspond to every area of the MMR s
 
-note that all of the city proper is a single shrid - this s
+Note that all of the city proper is a single shrid - the authors of SHRUG mention this as a problem in their documentation and
 
 ### 2.2 Exploration
 
-
-Table 1 presents a number of summary statistics for
-
-```{r}
+```{r echo  =FALSE, warning=FALSE}
 mmr_shrid <- readRDS("data/cleaned/mmr_shrid.rds")
 
-mmr_shrid |>
-  summarize(sc_pop = sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p),
-            st_pop = sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) |>
+tab <- mmr_shrid |>
+  summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
+            st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100, 
+            total = sc_pop + st_pop) |>
   as_tibble() |>
   select(-geometry) |>
-  kable(digits = 3)
+  rbind(mmr_shrid |>
+          filter(shrid2 != "11-27-518-99999-802794") |>
+  summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
+            st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100,
+            total = sc_pop + st_pop) |>
+     as_tibble() |>
+  select(-geometry)) |>
+  rbind(c(0.166 *100, 0.086 *100, (0.166 + 0.086)*100)) 
 
-mmr_shrid |>
-  ggplot(aes(x = pc11_pca_p_st / pc11_pca_tot_p)) + 
-  geom_histogram(bins = 50)
+rownames(tab) <- c("MMR", "MMR (excluding city proper)", "India")
+
+tab |>
+  rownames_to_column() |>
+  kable(digits = 2, col.names = c("Region", "SC Population (% of total)", "ST Population (% of total)", "Combined SC/ST Population (% of total)"), 
+        row.names = TRUE, caption = "Caste demography of the MMR vs. India")
 ```
 
-
-
+Table 1 shows
 
 ```{r echo = FALSE, warning=FALSE}
 
@@ -85,32 +99,41 @@ mmr_shrid |>
 
 Figure 1 displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is a single, large shrid, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move further from the city proper,
 
-This indicates 
+This indicates
 
+```{r}
+mmr_shrid_2 <- mmr_shrid |>
+  filter(shrid2 != "11-27-518-99999-802794")
+
+A = spdep::mat2listw(st_touches(mmr_shrid_2, sparse=FALSE), zero.policy = TRUE)
+
+broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_p_st) / 
+                                  mmr_shrid_2$pc11_pca_tot_p, A)) |>
+  select(estimate1, p.value) |>
+  kable(digits = 3, col.names = c("Geary's C", "P-value")) |>
+  kableExtra::kable_styling(font_size = 9)
+  
+```
 
 ## 3. Methodology
 
 ### 3.1 Primary Outcome
 
-The primary outcome of this study is the global spatial dissimilarity index.
+The primary outcome of this study is the global spatial dissimilarity index, first formalized in [@Feitosa_2007]. This index was chosen for its prior use in the Indian context[see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru] as well as its ability to mitigate the so-called "checkerboard problem"[@Reardon_2004], of central importance in a city like Mumbai
 
-Significance will be tested using a pseudo-significance measure, computed on random permutation tests as described in Feitosa et. al [see @Feitosa_2007 pp 309-310]
+Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using the procedure described in @Feitosa_2007 pp. 309-310].
 
 ## 4. Results
 
+## 5. Discussion and Evaluation
 
-
-## 5. Discussion and Evaluation 
-
-
-## Appendix 
+## Appendix
 
 https://www.freepressjournal.in/analysis/mumbai-naama-politicians-and-law-do-not-have-answers-to-mumbais-housing-discrimination
 
-https://link.springer.com/chapter/10.1007/978-3-030-64569-4_8#:~:text=The%20city%20is%20pervaded%20by,by%20class%2C%20caste%20and%20tribe.
+https://link.springer.com/chapter/10.1007/978-3-030-64569-4_8#:\~:text=The%20city%20is%20pervaded%20by,by%20class%2C%20caste%20and%20tribe.
 
 ### References
 
 ::: {#refs}
 :::
-
