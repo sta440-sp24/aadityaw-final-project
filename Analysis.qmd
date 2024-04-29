@@ -5,6 +5,8 @@ format: html
 editor: visual
 ---
 
+# Setup
+
 ```{r}
 library(foreign)
 library(tidyverse)
@@ -20,54 +22,41 @@ library(dukestm)
 library(seg)
 
 shurg_shp <- st_read("../final project data/shrug-shrid-poly-shp/shrid2_open.shp")
-shurg_sec <- st_read("data/shrug-pca11-csv/pc11_pca_clean_shrid.csv")
+shurg_pca <- read_csv("../final project data/shrug-pca11-csv/pc11_pca_clean_shrid.csv")
+
+shurg_pca_dist <- read_csv("../final project data/shrug-pca11-csv/pc11_pca_clean_pc11dist.csv")
+
+shurg_pca_subdist <- read_csv("../final project data/shrug-pca11-csv/pc11_pca_clean_pc11subdist.csv")
+
+
 shrug_subdist_shp <- st_read("../final project data/shrug-pc11subdist-poly-shp/subdistrict.shp")
 
 shrug_dist_shp <- st_read("../final project data/shrug-pc11dist-poly-shp/district.shp")
+
+
+
 shrug_secc <- read_csv("../shrug-secc/secc_urban_shrid.csv")
 
 shrug_secc_rural <- read_csv("../shrug-secc-rural/secc_rural_shrid.csv")
 
 shrug_secc_dist_urban <- read_csv("../shrug-secc/secc_urban_pc11subdist.csv")
 
+shrug_ec_shrid <- read_csv("../shrug-ec/ec13_shrid.csv")
+
+
+shrug_ec_dist <- read_csv("../shrug-ec/ec13_pc11dist.csv")
+
+shrug_ec_subdist <- read_csv("../shrug-ec/ec13_pc11subdist.csv")
+
+
+
 ```
 
 
 
-```{r }
+# Data Cleaning
 
-mmr_shrid |>
-  distinct(shrid2, .keep_all = TRUE)
-
-rural_shrid <- shrug_secc_rural |>
-  inner_join(mmr_shrid, by = "shrid2") |>
-  distinct(shrid2, .keep_all = TRUE) |>
-  st_as_sf()
-
-urban_shrid <- shrug_secc |>
-  inner_join(mmr_shrid, by = "shrid2") |>
-  distinct(shrid2, .keep_all = TRUE) |>
-  st_as_sf()
-
-combined_shrid <- plyr::rbind.fill(rural_shrid, urban_shrid) |>
-  st_as_sf()
-  
-
-
-
-ggplot() +
-  geom_sf(data = unincluded, color = "red") +
-  geom_sf(data = combined_shrid, color = "black") 
-
-unincluded <- mmr_shrid[!(mmr_shrid$shrid2 %in% combined_shrid$shrid2), ]
-
-
-write_rds(combined_shrid, "data/cleaned/secc_shrid.rds")
-
-write_rds(unincluded, "data/cleaned/missing_from_secc_shrid.rds")
-```
-
-
+## Make pca shrids
 
 
 ```{r}
@@ -82,41 +71,11 @@ mmr_shp <- shrug_subdist_shp |>
            pc11_d_id %in% c(517, 520)) |>
   filter(sd_name %in% c("Kalyan", "Bhiwandi", "Ulhasnagar", "Thane", "Panvel", "Vasai", "Virar", "Ambarnath", "Badlapur", "Karjat", "Khopoli", 
                         "Uran", "Pen", "Alibag", "Dombivili")) |>
-  rename(d_name = sd_name) |>
-  select(-pc11_sd_id)
+  rename(d_name = sd_name) 
 
-full_mmr_shp <- st_make_valid(rbind(mumbai_shp, mmr_shp))
-```
+full_mmr_shp <- st_make_valid(rbind(mumbai_shp, mmr_shp |>
+  select(-pc11_sd_id)))
 
-```{r}
-# delhi_shp <- shrug_subdist_shp |>
-#   filter(pc11_s_id == "07")
-# 
-# blr_shp <- shrug_dist_shp |>
-#   filter(str_detect(d_name, "Bangalore"))
-
-# 
-# delhi_shp |>
-#   ggplot() +
-#   geom_sf(fill = NA)
-# ints_delhi <- delhi_shp |>
-#   st_intersects(shurg_shp)
-# 
-# ints_blr <- blr_shp |>
-#   st_intersects(shurg_shp)
-# 
-# ints_blr2 <- blr_shp |>
-#   st_contains(shurg_shp)
-# 
-# delhi_shrid <- shurg_shp[unique(as.numeric(unlist(ints_delhi))), ] |>
-#   left_join(shurg_sec, by = "shrid2")
-# 
-# 
-# blr_shrid <- shurg_shp[unique(as.numeric(unlist(ints_blr))), ] |>
-#   left_join(shurg_sec, by = "shrid2")
-```
-
-```{r}
 ints <- full_mmr_shp |>
   st_intersects(shurg_shp)
 
@@ -128,21 +87,136 @@ mmr_shrid <- shurg_shp[unique(as.numeric(unlist(ints[3:13]))), ] |>
          pc11_pca_p_st = as.numeric(pc11_pca_p_st)
          ) 
 
+mum_dists <- shrug_dist_shp |>
+  filter(d_name %in% c("Mumbai", "Mumbai Suburban")) |>
+  inner_join(shurg_pca_dist |>
+               rename(pc11_d_id = pc11_district_id), by = "pc11_d_id") 
+
+
+mmr_shrid <- mmr_shrid |>
+  filter(shrid2 != "11-27-518-99999-802794") |>
+  plyr::rbind.fill(mum_dists) |>
+  st_as_sf()
+
+
 write_rds(mmr_shrid, "data/cleaned/mmr_shrid.rds")
 
 
-mmr_shrid |>
-  filter(shrid2 != "11-27-518-99999-802794") |>
-  mutate(sc_st_prop = (pc11_pca_p_sc + pc11_pca_p_st) / 
-                                  pc11_pca_tot_p) |>
-  ggplot() + 
-  geom_sf(aes(fill = sc_st_prop)) +
+mmr_shrid_2 <- mmr_shrid |>
+  filter(!is.na(shrid2))
+
+write_rds(mmr_shrid_2, "data/cleaned/mmr_shrid_2.rds")
+
+```
+
+
+
+## Make pca subdist
+
+
+```{r}
+mmr_subdist <- mmr_shp |>
+  inner_join(shurg_pca_subdist |>
+               rename(pc11_sd_id = pc11_subdistrict_id), by = "pc11_sd_id")
+mmr_subdist <- plyr::rbind.fill(mmr_subdist,
+                                mum_dists) |>
+  select(-pc11_district_id) |>
+  st_as_sf()
+
+ggplot() + 
+  geom_sf(data = mmr_subdist, aes(fill = (pc11_pca_p_sc + pc11_pca_p_st) / 
+                                  pc11_pca_tot_p)) +
   scale_fill_viridis_c()
 
-mmr_shrid_2 <- mmr_shrid |>
-  filter(shrid2 != "11-27-518-99999-802794")
+write_rds(mmr_subdist, "data/cleaned/mmr_subdist.rds")
+
+```
 
 
+## make other shrid
+
+```{r }
+rural_shrid <- shrug_secc_rural |>
+  inner_join(mmr_shrid, by = "shrid2") |>
+  distinct(shrid2, .keep_all = TRUE) |>
+  st_as_sf()
+
+urban_shrid <- shrug_secc |>
+  inner_join(mmr_shrid, by = "shrid2") |>
+  distinct(shrid2, .keep_all = TRUE) |>
+  st_as_sf()
+
+combined_shrid <- plyr::rbind.fill(rural_shrid, urban_shrid) |>
+  st_as_sf()
+
+write_rds(combined_shrid, "data/cleaned/secc_shrid.rds")
+
+
+mum_dists_all <- mum_dists |>
+  inner_join(shrug_ec_dist |>
+               rename(pc11_d_id = pc11_district_id), by = "pc11_d_id") |>
+  inner_join(shrug_secc_dist_urban |>
+               rename(pc11_d_id = pc11_district_id), by = "pc11_d_id")
+
+
+
+ec_shrid_mmr <- shrug_ec_shrid |>
+  inner_join(mmr_shrid, by = "shrid2") |>
+  plyr::rbind.fill(mum_dists) |>
+  st_as_sf()
+
+ggplot() + 
+  geom_sf(data = ec_shrid_mmr, aes(fill = ec13_count_st/ec13_count_all)) +
+  scale_fill_viridis_c()
+
+ggplot() + 
+  geom_sf(data = ec_shrid_mmr, aes(fill = ec13_count_obc/ec13_count_all)) +
+  scale_fill_viridis_c()
+
+
+write_rds(ec_shrid_mmr, "data/cleaned/all_surveys_mmr_shrid.rds")
+
+
+unincluded <- mmr_shrid[!(mmr_shrid$shrid2 %in% ec_shrid_mmr$shrid2), ]
+write_rds(unincluded, "data/cleaned/missing_from_all_shrid.rds")
+
+```
+
+## make other subdist
+
+
+```{r}
+ec_subdist_mmr <- mmr_subdist |>
+  inner_join(shrug_ec_subdist |>
+               rename(pc11_sd_id = pc11_subdistrict_id), by = "pc11_sd_id") |>
+  plyr::rbind.fill(mum_dists_all) |>
+  st_as_sf()
+
+
+secc_subdist_mmr <- mmr_subdist |>
+  inner_join(shrug_secc_dist_urban |>
+               rename(pc11_sd_id = pc11_subdistrict_id), by = "pc11_sd_id") |>
+  plyr::rbind.fill(mum_dists_all) |>
+  st_as_sf()
+
+write_rds(ec_subdist_mmr,"data/cleaned/ec_subdist_mmr.rds")
+write_rds(secc_subdist_mmr,"data/cleaned/secc_subdist_mmr.rds")
+
+ggplot() + 
+  geom_sf(data = ec_subdist_mmr, aes(fill = ec13_count_st/ec13_count_all)) +
+  scale_fill_viridis_c()
+
+```
+
+
+
+
+# Actual Analysis
+
+
+## Geary's/Morans
+
+```{r}
 A = spdep::mat2listw(st_touches(mmr_shrid_2, sparse=FALSE), zero.policy = TRUE)
 
 spdep::moran.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_p_st) / 
@@ -154,10 +228,24 @@ ggplot(mmr_shrid_2, aes(x = sqrt((pc11_pca_p_sc + pc11_pca_p_st) /
 ```
 
 
+## Seg Indices
+
 
 ```{r seg indices}
 # calculating segregation indices below
+x <- as_Spatial(st_geometry(mmr_shrid_2))
 
+
+df <- tibble(sc_pop = mmr_shrid_2$pc11_pca_p_sc +  mmr_shrid_2$pc11_pca_p_st, other_pop = mmr_shrid_2$pc11_pca_tot_p - (sc_pop))
+
+# spseg(x, df, smoothing = "kernel", sigma = 0.03)
+
+dissim(x, df)
+
+
+# try dissim with larger units? - possible now, data fixed
+# fix districts for mumbai - done
+# try econ census data - done
 
 ```
 

@@ -63,13 +63,20 @@ Finally, there were some missing shrids in the SECC datasets as compared to the 
 mmr_shrid <- readRDS("data/cleaned/mmr_shrid.rds")
 
 tab <- mmr_shrid |>
+  filter(is.na(shrid2)) |>
   summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
             st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100, 
             total = sc_pop + st_pop) |>
   as_tibble() |>
   select(-geometry) |>
   rbind(mmr_shrid |>
-          filter(shrid2 != "11-27-518-99999-802794") |>
+  summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
+            st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100, 
+            total = sc_pop + st_pop) |>
+  as_tibble() |>
+  select(-geometry)) |>
+  rbind(mmr_shrid |>
+          filter(!is.na(shrid2)) |>
   summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
             st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100,
             total = sc_pop + st_pop) |>
@@ -77,13 +84,15 @@ tab <- mmr_shrid |>
   select(-geometry)) |>
   rbind(c(0.166 *100, 0.086 *100, (0.166 + 0.086)*100)) 
 
-rownames(tab) <- c("MMR", "MMR (excluding city proper)", "India")
+rownames(tab) <- c("Mumbai (city proper)", "MMR", "MMR (excluding city proper)", "India")
 
 tab |>
   rownames_to_column() |>
   kable(digits = 2, col.names = c("Region", "SC Population (% of total)", "ST Population (% of total)", "Combined SC/ST Population (% of total)"), 
         row.names = TRUE, caption = "Caste demography of the MMR vs. India")
 ```
+
+
 
 ```{r echo = FALSE, warning=FALSE}
 
@@ -92,14 +101,22 @@ ggplot() +
   # filter(shrid2 != ) |>
   mutate(sc_st_prop = (pc11_pca_p_sc + pc11_pca_p_st) / 
                                   pc11_pca_tot_p),
-  aes(fill = sc_st_prop), color = ifelse(mmr_shrid$shrid2 == "11-27-518-99999-802794", "red", NA)) +
+  aes(fill = sc_st_prop), color = ifelse(is.na(mmr_shrid$shrid2), "red", NA)) +
   scale_fill_viridis_c() + 
   labs(fill = "Proportion of SC/ST residents") 
+
+
+mmr_shrid |> 
+  filter(is.na(mmr_shrid$shrid2)) |>
+  as_tibble() |>
+  select(-geometry) |>
+  reframe((pc11_pca_p_sc + pc11_pca_p_st) / 
+                                  pc11_pca_tot_p)
 ```
 
 Table 1 displays a breakdown of caste percentages
 
-This is confirmed by Figure 1, which displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is a single, large shrid, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move northwards from the original island city
+This is confirmed by Figure 1, which displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is are two large shrids, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move northwards from the original island city
 
 with high percentages observed in the Kalyan and Bhiwandi districts as well as parts of Vasai and Virar. A similar trend is observed to the east in Karjat and Panvel as well as the souhermost parts of Alibag/Pen district.
 
@@ -123,9 +140,11 @@ broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_
 
 Conducting a hypothesis test for Geary's C shows us clear evidence of positive spatial autocorrelation, indicating that a shrid with a high SC/ST proportion is likely to neighbor a shrid with a very similar proportion. These set the context
 
-## 3. Methodology
+## 3. Spatial Analysis
 
-### 3.1 Primary Outcome
+### 3.1 Methodology
+
+#### 3.1.1 Primary Outcome
 
 The primary outcome of this study is the global spatial dissimilarity index, as formulated in [@Reardon_2004], of SC/ST individuals vs. all other individuals. A spatial analog to the dissimilarity index
 
@@ -137,19 +156,23 @@ These metrics were calculated using the *seg* package in R, developed in part by
 
 Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using the procedure described in @Feitosa_2007 pp. 309-310, which was computed on a very similar index].
 
-### 3.2 Secondary Outcomes
+Avoid the "grid" problem - use subdistrict breakup as well??
+
+#### 3.1.2 Secondary Outcomes
 
 Tests if the city is split more along income lines than caste, acknowledging the high correlation between the two
 
 Produce a chloropleth of local segregation indices
 
-## 4. Results
+### 3.2. Results
 
-## 5. Discussion and Evaluation
+## 4. Conclusion and Discussion 
 
 The limitations of this study arose primarily from data availability and quality.
+Ideally, this study would have been conducted at the Ward Level
 
-Methodologically,
+
+Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. For example, even though Hong's measure meets compositional invariance criteria, it suffers from MAUP issues, something that may be worsened by the alternatingly arbitrary and non-arbitrary basis on which shrids are defined in SHRUG. 
 
 {{< pagebreak >}}
 
