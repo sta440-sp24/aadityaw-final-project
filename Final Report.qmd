@@ -21,19 +21,21 @@ Mumbai, India's financial and commercial capital, is both its wealthiest city an
 
 These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension.
 
-and combined with rising real estate prices, manifest in
-
-At the same time, real estate prices tend to decrease as one moves outward from the original island city
+At the same time, real estate prices tend to decrease as one moves north and east, effectively pricing out and incentivizing those shut out of the city's restrictive market to seek housing
 
 Daily commutes of three hours or more are common
 
 The state was the center of the caste movement
 
-The existence of widespread discrimination in Mumbai's housing market has been well-established in the literature \[\], despite recent laws that have attempted to curb the practice. However, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper.
+Combined with rising real estate prices, these have manifested in social segregation
 
-Further, analysis conducted in other cities tend to utilize
+Lower-caste Hindus, especially non-Brahmin Maharashtrians, are more likely to be non-vegetarian
 
-This project aims to explore to what extent
+The existence of widespread discrimination in Mumbai's housing market has been well-established in the literature [@Shaban2021], despite recent laws that have attempted to curb the practice [@Koppikar_2023]. However, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper.
+
+This project aims to explore to what extent Dalits and other lower caste groups have been pushed to the margins s
+
+at a more granular level
 
 [see @BHARATHI2023110951]
 
@@ -41,15 +43,17 @@ This project aims to explore to what extent
 
 The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is an open access repository that aims to link hundreds of Indian datasets comprising socio-economic surveys, censuses, and environmental studies with common geographic identifiers. Owing to the nation's size and diversity, Indian record-keeping is notoriously inconsistent, with formats, naming conventions, and even languages often differing within the same state; SHRUG circumvents this issue through its standardization process. SHRUG also obtains a level of geographic granulality that cannot be found in any single government dataset - by splitting the nation into 576,153 uniform areal units termed "shrids" and reaggregating all variables to these, it provides a largely consistent framework by which to analyse different regions at a deeper level than states, districts and sub-districts. It is for this reason that the project utilizes **2011 Population Census Data** [credited to @pcindia; @almn2021] over more recent data like the National Family Health Survey from 2019-21 - cleaning the latter to a level acceptable for analysis would have been a months-long project, as it is not currently available in SHRUG. It would also not yield the granularity desired of areal data for spatial modelling.
 
-The 2011 Population Census data co
+The 2011 Population Census Abstract data comes from decennial censuses the Indian government conducts, sampling over 650,000 households across
 
-Key variables of interest were the SC/ST population in each shrid and
+As stored at the shrid-level in SHRUG, it contains a multitude of variables on employment and occupation as well as demographics like
+
+Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population in each shrid and
+
+SC/ST are Indian government designations for Dalits and Adivasis
 
 ### 2.1 Data Cleaning
 
-As SHRUG stores district/sub-district data separately from shrid-level data, with no linking variables between the two, finding the specific shrids that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level districts or include very small portions of specific sub-districts. To rectify this problem as much as possible, I found the spatial intersection between most relevant districts and all shrids
-
-As a result, some areas of the MMR may be missing from the analy
+As SHRUG stores district/sub-district data separately from shrid-level data, with no linking variables between the two, finding the specific shrids that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level districts or include very small portions of specific sub-districts. To rectify this problem as much as possible, the spatial intersection (between the most relevant sub-districts of the MMR and all shrids was computed. This, however, missed out on a few areas of interest, most notably the majority of the municipal council of Khopoli, while including a few parcels of rural land that were not relevant. The final population of the cleaned dataset was
 
 the area of analysis may not perfectly correspond to every area of the MMR s
 
@@ -83,8 +87,6 @@ tab |>
         row.names = TRUE, caption = "Caste demography of the MMR vs. India")
 ```
 
-Table 1 shows
-
 ```{r echo = FALSE, warning=FALSE}
 
 mmr_shrid |>
@@ -97,7 +99,9 @@ mmr_shrid |>
   labs(fill = "Proportion of SC/ST residents")
 ```
 
-Figure 1 displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is a single, large shrid, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move further from the city proper,
+Table 1 displays a breakdown of caste percentages
+
+This is confirmed by Figure 1, which displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is a single, large shrid, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move further from the city proper,
 
 This indicates
 
@@ -115,6 +119,8 @@ broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_
   
 ```
 
+Conducting Geary's C shows us clear evidence of positive spatial autocorrelation i.e. that a shrid with
+
 ## 3. Methodology
 
 ### 3.1 Primary Outcome
@@ -128,10 +134,6 @@ Significance will be tested using a pseudo-significance "p-value" measure, compu
 ## 5. Discussion and Evaluation
 
 ## Appendix
-
-https://www.freepressjournal.in/analysis/mumbai-naama-politicians-and-law-do-not-have-answers-to-mumbais-housing-discrimination
-
-https://link.springer.com/chapter/10.1007/978-3-030-64569-4_8#:\~:text=The%20city%20is%20pervaded%20by,by%20class%2C%20caste%20and%20tribe.
 
 ### References
 
