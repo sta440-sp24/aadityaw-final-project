@@ -133,7 +133,7 @@ will be tested across different bandwidths
 
 This index was chosen for its prior use in the Indian context [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru] as well as its ability to mitigate the so-called "checkerboard problem" [@Reardon_2004], of great importance in a city like Mumbai where expansions of its territory and local geography have been shaped significantly by different waves of immigration.
 
-These metrics were calculated using the *seg* package in R, developed in part by Sullivan. As the *seg* package has been temporarily unavailable on CRAN since Feb 2024, owing to some dependency issues, an older version of the package available on the archive was used instead; the tar.gz can be found in the project repo.
+These metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As the *seg* package has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, an older version of the package available on the archive was used instead; the tar.gz can be found in the project repo.
 
 Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using the procedure described in @Feitosa_2007 pp. 309-310, which was computed on a very similar index].
 
