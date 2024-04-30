@@ -52,12 +52,9 @@ shrug_ec_subdist <- read_csv("../shrug-ec/ec13_pc11subdist.csv")
 
 ```
 
-
-
 # Data Cleaning
 
 ## Make pca shrids
-
 
 ```{r}
 shurg_shp <- st_make_valid(shurg_shp)
@@ -109,10 +106,7 @@ write_rds(mmr_shrid_2, "data/cleaned/mmr_shrid_2.rds")
 
 ```
 
-
-
 ## Make pca subdist
-
 
 ```{r}
 mmr_subdist <- mmr_shp |>
@@ -131,7 +125,6 @@ ggplot() +
 write_rds(mmr_subdist, "data/cleaned/mmr_subdist.rds")
 
 ```
-
 
 ## make other shrid
 
@@ -180,10 +173,21 @@ write_rds(ec_shrid_mmr, "data/cleaned/all_surveys_mmr_shrid.rds")
 unincluded <- mmr_shrid[!(mmr_shrid$shrid2 %in% ec_shrid_mmr$shrid2), ]
 write_rds(unincluded, "data/cleaned/missing_from_all_shrid.rds")
 
+
+
+shrug_ec_shrid |>
+   summarize(sc_pop = (sum(ec13_count_sc) / sum(ec13_count_all))* 100,
+            st_pop = (sum(ec13_count_st) / sum(ec13_count_all)) *100,
+            obc_pop = (sum(ec13_count_obc) / sum(ec13_count_all)) * 100)
+
+shurg_pca_subdist |>
+  filter(pc11_state_id == "27") |>
+   summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
+            st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100, 
+            total = sc_pop + st_pop)
 ```
 
 ## make other subdist
-
 
 ```{r}
 ec_subdist_mmr <- mmr_subdist |>
@@ -208,11 +212,7 @@ ggplot() +
 
 ```
 
-
-
-
 # Actual Analysis
-
 
 ## Geary's/Morans
 
@@ -227,9 +227,7 @@ ggplot(mmr_shrid_2, aes(x = sqrt((pc11_pca_p_sc + pc11_pca_p_st) /
   geom_histogram()
 ```
 
-
 ## Seg Indices
-
 
 ```{r seg indices}
 # calculating segregation indices below
@@ -300,4 +298,3 @@ dissim(x, df)
 
 
 ```
-

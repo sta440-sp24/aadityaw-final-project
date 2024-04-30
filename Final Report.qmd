@@ -19,7 +19,7 @@ opts_chunk$set(warning = FALSE, echo = FALSE)
 
 Mumbai, India's financial and commercial capital, is both its wealthiest city and its most diverse. The former headquarters of the Bombay Presidency during British rule, the city had long been home to large minority communities from around the province, but was always dominated by Maharashtrians and Gujaratis, the ethnic natives of the region. Post-independence, however, the city was (and continues to be) shaped by waves of immigration from across the state and the country, exponentially growing its population and consequently its urbanized area to accommodate these new residents. Large swathes of land to the north of the city, previously independent towns or villages, were annexed by administration. Mumbai is no stranger to expansion - indeed, the original island city owes its mere existence to land reclamation by the British - but its scale and scope in the past few decades has been unprecedented. In 1951, the city covered 231.5 $km^2$ and housed 2.3 million people. By 2011, the city's metropolitan region (henceforth shortened as MMR) spanned 6,328 $km^2$ with 22.8 million people, with the city proper housing 12.2 million over a mere 603 $km^2$. Today, Maharashtrians and Gujaratis only make up 42% and 19% of the city's population respectively.
 
-These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension. Combined with rising real estate prices - the highest in India and in the top 20 globally - these have manifested in *severe* social segregation in the housing market. Despite recent laws that have attempted to curb the practice [@Koppikar_2023], many apartment buildings have been found outright barring Muslims, lower caste individuals, and specific ethnicities; failing that, they ban "non-vegetarians" in order to circumvent the law, as lower/middle caste Hindus and religious minorities alike are more likely to be non-vegetarian. [@TNN]. From Gujarati-preferred colonies in suburban neighborhoods like Vile Parle and Ghatkopar to the ghetoization of Muslims in Mumbra, many in the city live segregated lives.
+These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension. Combined with rising real estate prices - the highest in India and in the top 20 globally - these have manifested in *severe* social segregation in the housing market. Despite recent laws that have attempted to curb the practice [@Koppikar_2023], many apartment buildings have been found outright barring Muslims, lower caste individuals, and specific ethnicities; failing that, they ban "non-vegetarians" in order to circumvent the law, as lower/middle caste Hindus and religious minorities alike are more likely to be non-vegetarian. [@TNN]. From Gujarati "colonies" in suburban neighborhoods like Vile Parle and Ghatkopar to the ghetoization of Muslims in Mumbra, many in the city live segregated lives.
 
 When not motivated by self-preservation as a social minority - as is the case for Christians strangehold on housing in Bandra, for example - the common thread uniting these blatantly discriminatory acts is likely a strong **casteist** sentiment. With housing societies going as far as having separate elevators for residents and "servants" [@IndiaTimes_2020], we see a strong revulsion of living in, or even sharing any space, as people with perceived undesirable characteristics, linked to the idea of the "impurity" of lower castes. Even when ethnic solidarity has been observed amidst rising tensions, caste fractures have run high Mumbai; for example, the Shiv Sena, a powerful, right-wing, pro-nativist political party that came into power a few decades ago rallying under preferential treatment for Maharashtrians, covertly opposed affirmative action for lower caste Maharashtrians (see Worli riots, opposition to Mandal Commission). This discrimination can extend to "natives" of the region as well - numerous stories have emerged in recent years [@Staff_2021] of Maharshtrians being denied housing by Gujaratis (on average, local Gujarati communities are wealthier and of higher caste than Maharashtrians).
 
@@ -29,7 +29,7 @@ This project hence aims to explore to what extent Dalits, Adivasis, and other lo
 
 The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is an open access repository that aims to link hundreds of Indian datasets comprising socio-economic surveys, censuses, and environmental studies with common geographic identifiers. Owing to the nation's size and diversity, Indian record-keeping is notoriously inconsistent, with formats, naming conventions, and even languages often differing within the same state. SHRUG obtains a level of standardization and geographic granularity that cannot be found in any single government dataset - by splitting the nation into 576,153 uniform areal units termed "shrids" and reaggregating all variables to these, it provides a largely consistent framework facilitating analysis at a deeper level than states, districts and sub-districts. This is the primary reason that this project utilizes **2011 Population Census Abstract (PCA), Socio-Economic and Caste Survey (SECC), and Economic Cenus (EC) Data** [@pcindia; @ecindia; @almn2021] over more recent data like the National Family Health Survey from 2019-21 - cleaning the latter to a level acceptable for analysis would have been a months-long project, as it is not currently available in SHRUG.
 
-The 2011 PCA, EC, and SECC datasets are the most current census data available for India; although usually conducted decennially, the 2021 census was postponed due to COVID and other political reasons. As stored at the shrid and subdistrict level in SHRUG, they contain a multitude of variables on employment, occupation, literacy, property ownership, and consumption, as well as demographic information like gender, caste, income, and education status. Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population percentages, home/land ownership shares, and employment/business ownership by different castes. Note that SC/ST are government designations for Dalits and Adivasis.
+The 2011 PCA, EC, and SECC datasets are the most current census data available for India; although usually conducted decennially, the 2021 census was postponed due to COVID and other political reasons. As stored at the shrid and subdistrict level in SHRUG, they contain a multitude of variables on employment, occupation, literacy, property ownership, and consumption, as well as demographic information like gender, caste, income, and education status. Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population percentages, home/land ownership shares, and employment/business ownership by different classes (including OBCs). Note that SC/ST are government designations for Dalits and Adivasis, while OBCs refer to a range of lower and middle castes considered socio-economically "backward".
 
 Surprisingly missing from the dataset was a breakdown of religions and ethnicities in each shrid. This could have provided additional nuance to our analysis, especially when looking at how they intersect with caste; contrary to popular belief, many non-Hindu Indians also have caste distinctions, while an ethnic breakdown could contextualize discrimination in terms of the familiarity of individuals with specific sub-castes not present in their native regions.
 
@@ -46,6 +46,11 @@ Finally, there were some missing shrids in the EC and SECC datasets as compared 
 ```{r echo  =FALSE, warning=FALSE}
 mmr_shrid <- readRDS("data/cleaned/mmr_shrid.rds")
 
+all_surveys_mmr_shrid <- readRDS("data/cleaned/all_surveys_mmr_shrid.rds")
+
+
+mmr_subdist <- readRDS("data/cleaned/mmr_subdist.rds")
+
 tab <- mmr_shrid |>
   filter(is.na(shrid2)) |>
   summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
@@ -54,21 +59,17 @@ tab <- mmr_shrid |>
   as_tibble() |>
   select(-geometry) |>
   rbind(mmr_shrid |>
-  summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
-            st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100, 
-            total = sc_pop + st_pop) |>
-  as_tibble() |>
-  select(-geometry)) |>
-  rbind(mmr_shrid |>
           filter(!is.na(shrid2)) |>
   summarize(sc_pop = (sum(pc11_pca_p_sc) / sum(pc11_pca_tot_p))* 100,
             st_pop = (sum(pc11_pca_p_st) / sum(pc11_pca_tot_p)) *100,
             total = sc_pop + st_pop) |>
      as_tibble() |>
   select(-geometry)) |>
-  rbind(c(0.166 *100, 0.086 *100, (0.166 + 0.086)*100)) 
+  rbind(c(11.81399, 9.352859, 21.16685)) |>
+  rbind(c(0.166 *100, 0.086 *100, (0.166 + 0.086)*100))
 
-rownames(tab) <- c("Mumbai (city proper)", "MMR", "MMR (excluding city proper)", "India")
+
+rownames(tab) <- c("Mumbai (city proper)", "MMR (excluding city proper)", "Maharashtra", "India")
 
 tab |>
   rownames_to_column() |>
@@ -76,7 +77,41 @@ tab |>
         row.names = TRUE, caption = "Caste demography of the MMR vs. India")
 ```
 
-```{r echo = FALSE, warning=FALSE}
+Table 1 demonstrates that immigration to Mumbai and the MMR has not been reflective of the broader caste population of India or of the state. This is not particularly surprising for the ST population, who primarily inhabit forested regions, but a marked difference must be noted in the SC population, who theoretically should be evenly spread out. What is notable for STs is the stark difference in population percentages between the city proper and the rest of the urban region, indicating their exclusion from the city.
+
+```{r}
+
+tab_2 <- all_surveys_mmr_shrid |>
+  filter(is.na(shrid2)) |>
+  summarize(sc_pop = (sum(ec13_count_sc) / sum(ec13_count_all))* 100,
+            st_pop = (sum(ec13_count_st) / sum(ec13_count_all)) *100,
+            obc_pop = (sum(ec13_count_obc) / sum(ec13_count_all)) * 100) |>
+  as_tibble() |>
+  select(-geometry) |>
+  rbind(all_surveys_mmr_shrid |>
+          filter(!is.na(shrid2)) |>
+  summarize(sc_pop = (sum(ec13_count_sc) / sum(ec13_count_all))* 100,
+            st_pop = (sum(ec13_count_st) / sum(ec13_count_all)) *100,
+            obc_pop = (sum(ec13_count_obc) / sum(ec13_count_all)) * 100) |>
+  as_tibble() |>
+  select(-geometry)) |>
+  rbind(c(9.817733, 4.166227, 34.17379)) 
+
+rownames(tab_2) <- c("Mumbai (city proper)","MMR (excluding city proper)", "India")
+
+tab_2 |> 
+  rownames_to_column() |>
+  kable(digits = 2, col.names = c("Region", "SC (% of total firms)", 
+                                  "ST (% of total firms)", 
+                                  "OBC (% of total firms)"), 
+        row.names = TRUE, caption = "Firm ownership by caste/class in the MMR")  |>
+  kableExtra::kable_styling(font_size = 9)
+```
+
+
+```{r echo = FALSE, warning=FALSE, fig.size = 10}
+
+library(patchwork)
 
 ggplot() + 
   geom_sf(data = mmr_shrid |>
@@ -85,18 +120,18 @@ ggplot() +
                                   pc11_pca_tot_p),
   aes(fill = sc_st_prop), color = ifelse(is.na(mmr_shrid$shrid2), "red", NA)) +
   scale_fill_viridis_c() + 
-  labs(fill = "Proportion of SC/ST residents") 
+  labs(fill = "Proportion of SC/ST residents", title = "Figure 1: Shrid-wise map of SC/ST populations") 
+  # theme(legend.position ="bottom", legend.title = element_text(size = 7),
+  #       legend.text = element_text(size = 7),
+  #       axis.text = element_text(size = 7),
+  #       legend.key.size = unit(0.6, "cm")) 
 ```
 
-Table 1 displays a breakdown of caste percentages
+This finding is confirmed by Figure 1. As before, note that all of the city proper is are two large shrids, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move northwards from the original island city, with higher percentages observed in the Kalyan and Bhiwandi sub-districts as well as parts of Vasai/Virar (see Appendix for a subdistrict-wise map). A particuarly high percentage is observed in the easternmost sub-district of Karjat, as well as the southermost parts of Alibag/Pen sub-districts in the south. This reinforces initial speculation as to the pricing out of these minorities towards northern and eastern parts of the MMR.
 
-This is confirmed by Figure 1, which displays a chloropleth-map of all regions of the MMR (including Mumbai City/Suburban districts). As before, note that all of the city proper is are two large shrids, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move northwards from the original island city
 
-with high percentages observed in the Kalyan and Bhiwandi districts as well as parts of Vasai and Virar. A similar trend is observed to the east in Karjat and Panvel as well as the souhermost parts of Alibag/Pen district.
+Table 2 shows us that lower and middle caste groups, especially OBCs, have a drastically lower ownership of firms in the city as compared to India, with a sharp difference even between Mumbai and the exurbs. This is less pronounced for SCs, but note that SCs and STs are far more disenfranchised as populations and have much lower capital ownership in general, so may not the best metric to evaluate. 
 
-This reinforces initial speculation as to the pricing out
-
-This indicates
 
 ```{r}
 mmr_shrid_2 <- mmr_shrid |>
@@ -107,12 +142,14 @@ A = spdep::mat2listw(st_touches(mmr_shrid_2, sparse=FALSE), zero.policy = TRUE)
 broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_p_st) / 
                                   mmr_shrid_2$pc11_pca_tot_p, A)) |>
   select(estimate1, p.value) |>
-  kable(digits = 3, col.names = c("Geary's C", "P-value")) |>
+  kable(digits = 3, col.names = c("Geary's C", "P-value"),
+        caption = "Shrid-level Geary's C test: SC/ST population percentages") |>
   kableExtra::kable_styling(font_size = 9)
   
 ```
 
-Conducting a hypothesis test for Geary's C shows us clear evidence of positive spatial autocorrelation, indicating that a shrid with a high SC/ST proportion is likely to neighbor a shrid with a very similar proportion. These set the context
+Conducting a hypothesis test for Geary's C shows us clear evidence of positive spatial autocorrelation (value < 1), indicating that a shrid with a high SC/ST proportion is likely to neighbor a shrid with a very similar proportion. These set the guiding context within which we will conduct our analysis and provide additional evidence for claims made in the introduction.
+
 
 ## 3. Spatial Analysis
 
@@ -120,15 +157,11 @@ Conducting a hypothesis test for Geary's C shows us clear evidence of positive s
 
 #### 3.1.1 Primary Outcome
 
-The primary outcome of this study is a set of descriptive statistics to describe spatial, caste/tribe-based segregation at a shrid-level.
-
-is the global spatial dissimilarity index, as formulated in \[\@\], of SC/ST individuals vs. all other individuals. A spatial analog to the dissimilarity index
-
-will be tested across different bandwidths
+The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices as in[@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index, comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others
 
 This index was chosen for its prior use in the Indian context [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru] as well as its ability to mitigate the so-called "checkerboard problem" [@Reardon_2004], of great importance in a city like Mumbai where expansions of its territory and local geography have been shaped significantly by different waves of immigration.
 
-These metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As the *seg* package has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, an older version of the package available on the archive was used instead; the tar.gz can be found in the project repo.
+These metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As the *seg* package has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, an older version of the package available on the archive was used instead; the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
 
 Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using the procedure described in @Feitosa_2007 pp. 309-310, which was computed on a very similar index].
 
@@ -174,3 +207,27 @@ Methodologically, we must also acknowledge that many of these measures are, rela
 {{< pagebreak >}}
 
 ## Appendix
+
+```{r}
+ggplot() +
+  geom_sf(data = mmr_subdist |>
+  # filter(shrid2 != ) |>
+  mutate(sc_st_prop = (pc11_pca_p_sc + pc11_pca_p_st) /
+                                  pc11_pca_tot_p),
+  aes(fill = sc_st_prop)) +
+  scale_fill_viridis_c() +
+  labs(fill = "Proportion of SC/ST residents", title = "Figure 3: Subdistrict-wise breakdown of caste populations") 
+  
+```
+
+```{r}
+# ggplot() + 
+#   geom_sf(data = mmr_subdist |>
+#   # filter(shrid2 != ) |>
+#   mutate(sc_st_prop = (pc11_pca_p_sc + pc11_pca_p_st) / 
+#                                   pc11_pca_tot_p),
+#   aes(fill = sc_st_prop)) +
+#   scale_fill_viridis_c() + 
+
+```
+
