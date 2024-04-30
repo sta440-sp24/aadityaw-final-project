@@ -108,7 +108,6 @@ tab_2 |>
   kableExtra::kable_styling(font_size = 9)
 ```
 
-
 ```{r echo = FALSE, warning=FALSE, fig.size = 10}
 
 library(patchwork)
@@ -127,11 +126,9 @@ ggplot() +
   #       legend.key.size = unit(0.6, "cm")) 
 ```
 
-This finding is confirmed by Figure 1. As before, note that all of the city proper is are two large shrids, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move northwards from the original island city, with higher percentages observed in the Kalyan and Bhiwandi sub-districts as well as parts of Vasai/Virar (see Appendix for a subdistrict-wise map). A particuarly high percentage is observed in the easternmost sub-district of Karjat, as well as the southermost parts of Alibag/Pen sub-districts in the south. This reinforces initial speculation as to the pricing out of these minorities towards northern and eastern parts of the MMR.
+This finding is confirmed by Figure 1. As before, note that all of the city proper is are two large shrids, outlined in red on the map. We observe a pattern of increasing SC/ST percentages as we move northwards from the original island city, with higher percentages observed in the Kalyan and Bhiwandi sub-districts as well as parts of Vasai/Virar (see Figure 3 in Appendix for a subdistrict-wise map). A particuarly high percentage is observed in the easternmost sub-district of Karjat, as well as the southermost parts of Alibag/Pen sub-districts in the south. This reinforces initial speculation as to the pricing out of these minorities towards northern and eastern parts of the MMR.
 
-
-Table 2 shows us that lower and middle caste groups, especially OBCs, have a drastically lower ownership of firms in the city as compared to India, with a sharp difference even between Mumbai and the exurbs. This is less pronounced for SCs, but note that SCs and STs are far more disenfranchised as populations and have much lower capital ownership in general, so may not the best metric to evaluate. 
-
+Table 2 shows us that lower and middle caste groups, especially OBCs, have a drastically lower ownership of firms in the city as compared to India, with a sharp difference even between Mumbai and the exurbs. This is less pronounced for SCs, but note that SCs and STs are far more disenfranchised as populations and have much lower capital ownership in general, so may not the best metric to evaluate.
 
 ```{r}
 mmr_shrid_2 <- mmr_shrid |>
@@ -148,8 +145,7 @@ broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_
   
 ```
 
-Conducting a hypothesis test for Geary's C shows us clear evidence of positive spatial autocorrelation (value < 1), indicating that a shrid with a high SC/ST proportion is likely to neighbor a shrid with a very similar proportion. These set the guiding context within which we will conduct our analysis and provide additional evidence for claims made in the introduction.
-
+Conducting a hypothesis test for Geary's C shows us clear evidence of positive spatial autocorrelation (value \< 1), indicating that a shrid with a high SC/ST proportion is likely to neighbor a shrid with a very similar proportion. These set the guiding context within which we will conduct our analysis and provide additional evidence for claims made in the introduction.
 
 ## 3. Spatial Analysis
 
@@ -157,36 +153,30 @@ Conducting a hypothesis test for Geary's C shows us clear evidence of positive s
 
 #### 3.1.1 Primary Outcome
 
-The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices as in[@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index, comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others
+The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index \[@Morrill_1992\], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others.
 
-This index was chosen for its prior use in the Indian context [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru] as well as its ability to mitigate the so-called "checkerboard problem" [@Reardon_2004], of great importance in a city like Mumbai where expansions of its territory and local geography have been shaped significantly by different waves of immigration.
+The conventional aspatial global dissimilarity index, although still widely used in sociological, economics, and public health research, has long been considered insufficient to accurately capture the effects of spatial correlation. This is primarily due to the so-called "checkerboard problem" [@Reardon_2004], where high exposure (i.e. at small distances from each other and easily able to interact), but non-clustered distributions of two groups can appear more segregated than they are. In a city like Mumbai, where expansions of its territory and local geography have been shaped significantly by different waves of immigration, this could greatly affect our estimates, so must be accounted for. The specific choice of Reardon and O'Sullivan's measure was because a similar, although not identical, kernel-based spatial index has been used in the Indian context earlier to some success [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru using @Feitosa_2007's index]. However, neither the aspatial index nor Reardon and O'Sullivan's global dissimilarity index satisfy the compositional invariance criterion [@Barron_Hall_Rich_Arias_2023; @Reardon_2004] - the implications of this for the analysis of the region are discussed in further detail in the Evaluation. Reardon and O'Sullivan also require tuning of the kernel/smoothing algorithm, which I was unfamiliar with and had to rely on the software's best guess. Therefore, I also included Morrill's measure, which is a more easily intepretable, direct modification of the aspatial index, but suffers from the MAUP (see Secondary Outcome for details).
 
-These metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As the *seg* package has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, an older version of the package available on the archive was used instead; the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
+All of these metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As *seg* has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, I used an older version of the package available on the archive, for which the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
 
-Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using the procedure described in @Feitosa_2007 pp. 309-310, which was computed on a very similar index].
+Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using a procedure similar to @Feitosa_2007 pp. 309-310]. This will be conducted using the *OasisR* package - as this package depended on *seg*, it is also no longer available on CRAN, so an archived version from Dec 2023 has been used (in repo).
 
-#### 3.1.2 Secondary Outcomes
+#### 3.1.2 Secondary Outcome
 
-The secondary outcome of this study is the same set of spatial statistics, but computed at a subdistrict level.
-
-Tests if the city is split more along income lines than caste, acknowledging the high correlation between the two
-
-Test at subdistrict level
-
-Avoid the "grid" problem - use subdistrict breakup as well??
+The secondary outcome of this study is the same set of spatial statistics, but computed at the census' sub-district level. This is primarily to account for potential variability in results resulting from the modifiable areal unit problem (MAUP), also known as the "grid" problem [@Feitosa_2007]. Most spatial data is stored in an areal format - indeed, so was the data for this study - but the exact choice of area unit, including its shape and its size, can have large impacts on how one estimates segregation. This is especially true for data where we can only compute a simple spatial weight matrix to quantify interactions between areal units, as is the case for our data, rather than an intensity of interaction function. For example, smaller units are likely to be more homogeneous so could show a smaller segregation effect than larger ones. Neither the aspatial or Morrill's measure avoid this issue, and although Reardon and O'Sullivan largely avoid it through kernel-based population estimates, it may still be informative to see how estimate differ.
 
 ### 3.2. Results
 
 ```{r}
 prim <- tibble(d_sc = c(0.2414745), d_st = c(0.525149), d_comb = c(0.2799382)) |>
   kable(digits = 3, col.names = c("SC", "ST", "Combined SC/ST"),
-        caption = "Primary Outcome Results - Global Spatial Dissimilarity Index")
+        caption = "Primary Outcome Results - Shrid-level Indices")
 ```
 
 ```{r}
 tibble(d_sc = 0.1023268, d_st = 0.4275618, d_comb = 0.1536606) |>
   kable(digits = 3, col.names = c("SC", "ST", "Combined SC/ST"),
-        caption = "Secondary Outcome Results")
+        caption = "Secondary Outcome Results - Subdistrict-level Indices")
 
 tibble()
 ```
@@ -216,7 +206,7 @@ ggplot() +
                                   pc11_pca_tot_p),
   aes(fill = sc_st_prop)) +
   scale_fill_viridis_c() +
-  labs(fill = "Proportion of SC/ST residents", title = "Figure 3: Subdistrict-wise breakdown of caste populations") 
+  labs(fill = "Proportion of SC/ST residents", title = "Figure 3: Subdistrict-wise map of SC/ST populations") 
   
 ```
 
@@ -230,4 +220,3 @@ ggplot() +
 #   scale_fill_viridis_c() + 
 
 ```
-
