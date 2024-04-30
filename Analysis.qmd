@@ -341,20 +341,20 @@ write_rds(reard_comb, "reard_comb.rds")
 # reard measures sec
 
 
-x <- sf::as_Spatial(st_geometry(mmr_dist))
+x <- sf::as_Spatial(st_geometry(mmr_subdist))
 
-df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_st, 
-                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_st, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
 
-reard_st_prim <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+reard_st <- as.list(seg::spseg(x, df, smoothing = "kernel"))
 
-write_rds(reard_st_prim, "reard_st_sec.rds")
+write_rds(reard_st, "reard/reard_st_sec.rds")
 
-df <- tibble(sc_pop = mmr_dist2$pc11_pca_p_sc, 
-                 other_pop = mmr_dist2$pc11_pca_tot_p - sc_pop)
-reard_sc_prim <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_sc, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
+reard_sc <- as.list(seg::spseg(x, df, smoothing = "kernel"))
 
-write_rds(reard_sc_prim, "reard_sc_sec.rds")
+write_rds(reard_sc, "reard/reard_sc_sec.rds")
 
 ec_subdist_mmr <- read_rds("data/cleaned/ec_subdist_mmr.rds")
 
@@ -368,7 +368,7 @@ df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_obc,
 
 reard_obc <- as.list(seg::spseg(x, df, smoothing = "kernel"))
 
-write_rds(reard_obc, "reard_obc_sec.rds")
+write_rds(reard_obc, "reard/reard_obc_sec.rds")
 
 
 df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_sc + ec_subdist_mmr$ec13_count_st, 
@@ -376,6 +376,49 @@ df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_sc + ec_subdist_mmr$ec13_count_s
 
 reard_comb <- as.list(seg::spseg(x, df, smoothing = "kernel"))
 
-write_rds(reard_comb, "reard_comb_sec.rds")
+write_rds(reard_comb, "reard/reard_comb_sec.rds")
 
 ```
+
+
+```{r}
+x <- sf::as_Spatial(mmr_subdist)
+
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_st, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
+
+xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
+                       sampleunit = 'unit', spatobj = x)
+
+xtest$Summary
+OasisR::ResamplePlot(xtest)
+```
+
+```{r}
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_sc, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
+
+xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
+                       sampleunit = 'unit', spatobj = x)
+
+xtest$Summary
+OasisR::ResamplePlot(xtest)
+```
+
+```{r}
+x <- sf::as_Spatial(mmr_shrid)
+
+
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_sc, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
+                       sampleunit = 'unit', spatobj = x)
+
+xtest$Summary
+
+
+OasisR::ResamplePlot(xtest)
+```
+
+

@@ -21,7 +21,7 @@ Mumbai, India's financial and commercial capital, is both its wealthiest city an
 
 These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension. Combined with rising real estate prices - the highest in India and in the top 20 globally - these have manifested in *severe* social segregation in the housing market. Despite recent laws that have attempted to curb the practice [@Koppikar_2023], many apartment buildings have been found outright barring Muslims, lower caste individuals, and specific ethnicities; failing that, they ban "non-vegetarians" in order to circumvent the law, as lower/middle caste Hindus and religious minorities alike are more likely to be non-vegetarian. [@TNN]. From Gujarati "colonies" in suburban neighborhoods like Vile Parle and Ghatkopar to the ghetoization of Muslims in Mumbra, many in the city live segregated lives.
 
-When not motivated by self-preservation as a social minority - as is the case for Christians strangehold on housing in Bandra, for example - the common thread uniting these blatantly discriminatory acts is likely a strong **casteist** sentiment. With housing societies going as far as having separate elevators for residents and "servants" [@IndiaTimes_2020], we see a strong revulsion of living in, or even sharing any space, as people with perceived undesirable characteristics, linked to the idea of the "impurity" of lower castes. Even when ethnic solidarity has been observed amidst rising tensions, caste fractures have run high Mumbai; for example, the Shiv Sena, a powerful, right-wing, pro-nativist political party that came into power a few decades ago rallying under preferential treatment for Maharashtrians, covertly opposed affirmative action for lower caste Maharashtrians (see Worli riots, opposition to Mandal Commission). This discrimination can extend to "natives" of the region as well - numerous stories have emerged in recent years [@Staff_2021] of Maharshtrians being denied housing by Gujaratis (on average, local Gujarati communities are wealthier and of higher caste than Maharashtrians).
+When not motivated by self-preservation as a social minority, the common thread uniting these blatantly discriminatory acts is likely a strong **casteist** sentiment. With housing societies going as far as having separate elevators for residents and "servants" [@IndiaTimes_2020], we see a strong revulsion of living in, or even sharing any space, as people with perceived undesirable characteristics, linked to the idea of the "impurity" of lower castes. Even when ethnic solidarity has been observed amidst rising tensions, caste fractures have run high Mumbai; for example, the Shiv Sena, a powerful, right-wing, pro-nativist political party that came into power a few decades ago rallying under preferential treatment for Maharashtrians, covertly opposed affirmative action for lower caste Maharashtrians (see Worli riots, opposition to Mandal Commission). This discrimination can extend to "natives" of the region as well - numerous stories have emerged in recent years [@Staff_2021] of Maharshtrians being denied housing by Gujaratis (on average, local Gujarati communities are wealthier and of higher caste than Maharashtrians).
 
 This project hence aims to explore to what extent Dalits, Adivasis, and other lower caste groups have been pushed to the margins of the city, as well as how current demographics of the region reflect the characteristics of immigrating populations. The primary objective of the project is descriptive rather than inferential or predictive, and aims to obtain a spatially-informed understanding of segregation both within Mumbai's exurbs and between the city and its fringes. Spatial segregation in Mumbai's housing has been well-established in the literature [@Shaban2021]; however, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper. In a city with limited land space, segregation effectively incentivizes those shut out of its restrictive market to either live in slum-like informal tenements or to seek housing in far-flung satellite cities in the MMR. Not coincidentally, real estate prices also tend to decrease as one moves northwards and eastwards from the old city, further pushing lower-income individuals (who are disproportionately lower-caste and/or Muslim) outwards. This has the potential for severe business impacts [see @BHARATHI2023110951] - daily commutes of three hours or more are not uncommon in the region, as a majority of employment tends to be concentrated in industrial areas and business districts in the city proper, even today. There is also evidence that these exurbs are less developed and have reduced access to public services[pre-print from @Asher2023ResidentialSA], further underlining the necessity of this study.
 
@@ -153,17 +153,17 @@ Conducting a hypothesis test for Geary's C shows us clear evidence of positive s
 
 #### 3.1.1 Primary Outcome
 
-The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index [@Morrill_1992], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others.
+The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index [@Morrill_1992], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others. Thes statistics are theoretically bounded between 0 and 1, with 1 being some measure of perfect segregation/no diversity and 0 being no segregation/perfect diversity (elaborated upon in Results).
 
-The conventional aspatial global dissimilarity index, although still widely used in sociological, economics, and public health research, has long been considered insufficient to accurately capture the effects of spatial correlation. This is primarily due to the so-called "checkerboard problem" [@Reardon_2004], where high exposure (i.e. at small distances from each other and easily able to interact), but non-clustered distributions of two groups can appear more segregated than they are. In a city like Mumbai, where expansions of its territory and local geography have been shaped significantly by different waves of immigration, this could greatly affect our estimates, so must be accounted for. The specific choice of Reardon and O'Sullivan's measure was because a similar, although not identical, kernel-based spatial index has been used in the Indian context earlier to some success [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru using @Feitosa_2007's index]. However, neither the aspatial index nor Reardon and O'Sullivan's global dissimilarity index fully satisfy the compositional invariance criterion [@Barron_Hall_Rich_Arias_2023; @Reardon_2004] - the implications of this for the analysis of the region are discussed in further detail in the Evaluation. Reardon and O'Sullivan also require tuning of the kernel/smoothing algorithm, which I was unfamiliar with and had to rely on the software's best guess. Therefore, I also included Morrill's measure, which is a more easily intepretable, direct modification of the aspatial index, but suffers from the MAUP (see Secondary Outcome for details).
+The conventional aspatial global dissimilarity index, although still widely used, has long been considered insufficient to accurately capture the effects of spatial correlation. This is primarily due to the so-called "checkerboard problem" [@Reardon_2004], where high exposure (i.e. at small distances from each other and easily able to interact), but non-clustered distributions of two groups can appear more segregated than they are. In a city like Mumbai, where expansions of its territory and local geography have been shaped significantly by different waves of immigration, this could greatly affect our estimates. The specific choice of Reardon and O'Sullivan's (henceforth abbrv. RS) measure was because a similar, although not identical, kernel-based spatial index has been previously used in the Indian context to some success [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru using @Feitosa_2007's index]. However, neither the aspatial index nor the RS global dissimilarity index fully satisfy the compositional invariance criterion [@Barron_Hall_Rich_Arias_2023; @Reardon_2004] - the implications of this for the analysis of the region are debated in further detail in the Discussion section. RS also requires tuning of the kernel/smoothing algorithm, which I was unfamiliar with and had to rely on the software's best guess. Therefore, I also included Morrill's measure, which is a more easily intepretable, direct modification of the aspatial index, but suffers from the MAUP (see Secondary Outcome for details).
 
-All of these metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As *seg* has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, I used an older version of the package available on the archive, for which the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
+These metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As *seg* has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, I used an older version of the package available on the archive, for which the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
 
 Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using a procedure similar to @Feitosa_2007 pp. 309-310]. This will be conducted using the *OasisR* package - as this package depended on *seg*, it is also no longer available on CRAN, so an archived version from Dec 2023 has been used (in repo).
 
 #### 3.1.2 Secondary Outcome
 
-The secondary outcome of this study is the same set of spatial statistics, but computed at the census' sub-district level. This is primarily to account for potential variability in results resulting from the modifiable areal unit problem (MAUP), also known as the "grid" problem [@Feitosa_2007]. Most spatial data is stored in an areal format - indeed, so was the data for this study - but the exact choice of area unit, including its shape and its size, can have large impacts on how one estimates segregation. This is especially true for data where we can only compute a simple spatial weight matrix to quantify interactions between areal units, as is the case for our data, rather than an intensity of interaction function. For example, smaller units are likely to be more homogeneous so could show a smaller segregation effect than larger ones. Neither the aspatial index or Morrill's measure avoid this issue, and although Reardon and O'Sullivan largely avoid it through kernel-based population estimates, it may still be informative to see how estimates differ.
+The secondary outcome of this study is the same set of spatial statistics, but computed at the census' sub-district level. This is primarily to account for potential variability in results resulting from the modifiable areal unit problem (MAUP), also known as the "grid" problem [@Feitosa_2007]. Most spatial data is stored in an areal format - indeed, so was the data for this study - but the exact choice of area unit, including its shape and its size, can have large impacts on how one estimates segregation. This is especially true for data where we can only compute a simple spatial weight matrix to quantify interactions between areal units, as is the case for our data, rather than an intensity of interaction function. For example, smaller units are likely to be more homogeneous so could show a smaller segregation effect than larger ones. Neither the aspatial index or Morrill's measure avoid this issue, and although RS largely avoids it through kernel-based population estimates, it may still be informative to see how estimates differ.
 
 ### 3.2. Results
 
@@ -226,19 +226,28 @@ prim <- tibble(morrill_d = c(morrill_sc$d, morrill_st$d, morrill_comb$d, morrill
                reard_r = c(reard_sc$r, reard_st$r, reard_comb$r, reard_obc$r),
                reard_h = c(reard_sc$h, reard_st$h, reard_comb$h, reard_obc$h)) 
 
-rownames(prim) <- c("SC pop vs. all", "ST pop vs. all", "SC/ST firm ownership vs. all", 
+rownames(prim) <- c("SC residents vs. all", "ST residents vs. all", "SC/ST firm ownership vs. all", 
                     "OBC firm ownership vs. all")
 
 prim |>
-  kable(digits = 3, col.names = c("Aspatial D Index", "Morrill's D Index", 
+  rownames_to_column() |>
+  kable(digits = 3, col.names = c("Comparison Type", "Aspatial D Index", "Morrill's D Index",
                                   "Reard/O'Sull D Index", "Reard/O'Sull R Index",
                                   "Reard/O'Sull H Index"),
         caption = "Primary Outcome Results - Shrid-level Indices")
 
 ```
 
+First, we can note that the spatial indices are uniformly lower than the aspatial index, underlining the importance of considering spatial correlation when examining segregation. The aspatial index seems to display clear segregation for all comparisons. Glancing at our results, however, we see generally inconsistent results with RS's *R* and *H* indices, with some negative values as well. *R* refers to how much less diverse an individual's local environment is, on average, as opposed to the global environment; *H* is an entropy-based measure. While a value of 1 would imply a mono-caste/class/tribe shrid, a negative value for either implies that shrids are more diverse than the global environment, on average. This is certainly an unintuitive finding for both SC residential and SC/ST firm ownership discrimination and will be dissected further in the Discussion Section.
+
+With these caveats in mind, we still observe a value of approximately 0.1 for Morrill's Dissimilarity index for the SC population, a result with "pseudo-significant" p-value = 0.01 (see appendix). However, the strongest evidence is undoubtedly that for Scheduled Tribes, who have the highest levels of segregation in the MMR across all metrics. Using RS's *R* index, relatively easier to interpret, we see that STs neighborhoods will be roughly 11.4% less diverse/have a 11.4% higher concentration of STs than average for the MMR. Similarly, Morrill's D Index indicates 28.4% of the MMR's total ST population would have to move to achieve a perfectly even distribution (i.e. be well-integrated), a staggering number. There statistics were also pseudo-significant by our permutation test.
+
+Finally, when examining OBC firm ownership statistics, we see a sharp drop-off between the aspatial dissimilarity value vs. Morrill's dissimilarity. Intutively, this makes sense - a large proportion of native Maharashtrians and Gujaratis fall under the OBC designation, and their longer history in the city may have led to more distinct enclaves and spatial arrangements. Intestingly, OBC's segregation, at least when examined on a firm ownership basis, seems roughly equal to or slightly higher than SC segregation, with RS measures more consistent as well. However, it is unclear how valid this comparison is, given the conceptual differences between population concentration and capital ownership and the fact that OBCs own capital at a far higher rate, as previously mentioned; this utility of this segregation measure is discussed further in the Discussion section.
 
 ```{r}
+
+ec_subdist_mmr <- read_rds("data/cleaned/ec_subdist_mmr.rds")
+
 # calculating segregation indices below - secondary
 
 ### morrill_sc
@@ -267,17 +276,17 @@ morrill_st <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TR
 
 
 # morill_comb firm 
-x <- sf::as_Spatial(st_geometry(ec_shrid_mmr))
+x <- sf::as_Spatial(st_geometry(ec_subdist_mmr))
 
-df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_sc + ec_shrid_mmr$ec13_count_st, 
-                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_sc + ec_subdist_mmr$ec13_count_st, 
+                 other_pop = ec_subdist_mmr$ec13_count_all - sc_pop)
 
 morrill_comb <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
 
 # morill_obc firm
 
-df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_obc, 
-                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_obc, 
+                 other_pop = ec_subdist_mmr$ec13_count_all - sc_pop)
 
 morrill_obc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
 
@@ -292,28 +301,31 @@ morrill_obc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = T
 
 
 
-
 ```{r}
 sec <- tibble(morrill_d = c(morrill_sc$d, morrill_st$d, morrill_comb$d, morrill_obc$d), 
                morilll_dm =  c(morrill_sc$dm, morrill_st$dm, morrill_comb$dm,
                                morrill_obc$dm)) 
 
-rownames(sec) <- c("SC pop vs. all", "ST pop vs. all", "SC/ST firm ownership vs. all", 
+rownames(sec) <- c("SC residents vs. all", "ST residents vs. all", "SC/ST firm ownership vs. all", 
                     "OBC firm ownership vs. all")
 sec |>
-  kable(digits = 3, col.names = c("Aspatial D Index", "Morrill's D Index"),
+  rownames_to_column() |>
+  kable(digits = 3, col.names = c("Comparison Type", 
+                                  "Aspatial D Index", "Morrill's D Index"),
         caption = "Secondary Outcome Results - District-level Indices")
 ```
 
-
-
+On repeated efforts, Reardon's and O' Sullivan's measures failed to compute for any of our desired secondary comparisons. This may owe to the number of subdistricts simply being too small to obtain an accurate kernel estimation of the population density function. However, examining the remaining indices, very similar results are seen to the primary outcome, and no conclusions are majorly affected, showing that this analysis is fairly robust to the "grid size" problem. The smaller values overall for subdistrict indices indicate that at a more granular level, population compositions are actually more heterogeneous, which may signal the necessity of an even smaller unit of analysis than shrids for the most accurate results.
 
 
 ## 4. Conclusion and Discussion
 
+This project's analysis showed less segregation against SC individuals than initially may have been expected, but still displayed convincing evidence 
+
+
 Many of the limitations of this study arose from data availability and quality. Ideally, this study would have been conducted at the Ward Level, which would haven given us granularity for specific neighborhoods in the region that have sociological and historical value. 
 
-It would would also have been conducted with newer data
+It would also have been conducted with newer data
 
 The fact that the city proper only achieved the granularity of two shrids may have affeted our 
 
@@ -321,7 +333,7 @@ Methodologically, we must also acknowledge that many of these measures are, rela
 
 Tehc 
 
-
+Finally, we must rbitrary measure of firm ownership 
 
 {{< pagebreak >}}
 
@@ -356,3 +368,5 @@ ggplot() +
 #   scale_fill_viridis_c() + 
 
 ```
+
+**Modifications to seg**: In dissim.internals, all do.call function calls called their functions with their names in quotes (i.e. "spdep::poly2nb" instead of spdep::poly2nb), which prevented dissim from working correctly. I changed this to the non-quoted version, which made the package work.
