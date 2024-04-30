@@ -1,5 +1,5 @@
 ---
-title: "Housing discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based segregation"
+title: "Housing market and employment discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based segregation"
 author: "Aaditya Warrier"
 bibliography: references.bib
 format: pdf
@@ -17,35 +17,19 @@ opts_chunk$set(warning = FALSE, echo = FALSE)
 
 ## 1. Introduction
 
-Mumbai, India's financial and commercial capital, is both its wealthiest city and its most diverse. The current capital of Maharashtra and the former headquarters of the Bombay Presidency during British rule - which at its peak extended as far as present-day Sindh in Pakistan - the city has long been home to large minority communities, but was always dominated by Maharashtrians and Gujaratis, who comprised a bulk of the natives of the region. Post-independence, however, the city was (and continues to be) shaped by waves of immigration from across the state and the country, exponentially growing its population and consequently its urbanized area to accommodate these new residents. Large swathes of land to the north of the city, previously independent towns or villages, were annexed by administration, with sprawl oriented around the three major railway lines emanating from the historic city. Mumbai is no stranger to expansion - indeed, the original island city owes its mere existence to land reclamation by the British - but its scale and scope in the past few decades has been unprecedented. In 1951, the city covered 231.5 $km^2$ and housed 2.3 million people. By 2011, the city's metropolitan region (henceforth shortened as MMR) spanned 6,328 $km^2$ with 22.8 million people, with the city proper housing 12.2 million over a mere 603 $km^2$. Today, Maharashtrians and Gujaratis only make up 42% and 19% of the city's population respectively, the rest being natives of other states.
+Mumbai, India's financial and commercial capital, is both its wealthiest city and its most diverse. The former headquarters of the Bombay Presidency during British rule, the city had long been home to large minority communities from around the province, but was always dominated by Maharashtrians and Gujaratis, the ethnic natives of the region. Post-independence, however, the city was (and continues to be) shaped by waves of immigration from across the state and the country, exponentially growing its population and consequently its urbanized area to accommodate these new residents. Large swathes of land to the north of the city, previously independent towns or villages, were annexed by administration. Mumbai is no stranger to expansion - indeed, the original island city owes its mere existence to land reclamation by the British - but its scale and scope in the past few decades has been unprecedented. In 1951, the city covered 231.5 $km^2$ and housed 2.3 million people. By 2011, the city's metropolitan region (henceforth shortened as MMR) spanned 6,328 $km^2$ with 22.8 million people, with the city proper housing 12.2 million over a mere 603 $km^2$. Today, Maharashtrians and Gujaratis only make up 42% and 19% of the city's population respectively.
 
-These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension.
+These rapid changes in demography have brought with them a significant rise in ethnic, religious, and caste tension. Combined with rising real estate prices - the highest in India and in the top 20 globally - these have manifested in *severe* social segregation in the housing market. Despite recent laws that have attempted to curb the practice [@Koppikar_2023], many apartment buildings have been found outright barring Muslims, lower caste individuals, and specific ethnicities; failing that, they ban "non-vegetarians" in order to circumvent the law, as lower/middle caste Hindus and religious minorities alike are more likely to be non-vegetarian. [@TNN]. From Gujarati-preferred colonies in suburban neighborhoods like Vile Parle and Ghatkopar to the ghetoization of Muslims in Mumbra, many in the city live segregated lives.
 
-At the same time, real estate prices tend to decrease as one moves north and east, effectively pricing out and incentivizing those shut out of the city's restrictive market to seek housing
+When not motivated by self-preservation as a social minority - as is the case for Christians strangehold on housing in Bandra, for example - the common thread uniting these blatantly discriminatory acts is likely a strong **casteist** sentiment. With housing societies going as far as having separate elevators for residents and "servants" [@IndiaTimes_2020], we see a strong revulsion of living in, or even sharing any space, as people with perceived undesirable characteristics, linked to the idea of the "impurity" of lower castes. Even when ethnic solidarity has been observed amidst rising tensions, caste fractures have run high Mumbai; for example, the Shiv Sena, a powerful, right-wing, pro-nativist political party that came into power a few decades ago rallying under preferential treatment for Maharashtrians, covertly opposed affirmative action for lower caste Maharashtrians (see Worli riots, opposition to Mandal Commission). This discrimination can extend to "natives" of the region as well - numerous stories have emerged in recent years [@Staff_2021] of Maharshtrians being denied housing by Gujaratis (on average, local Gujarati communities are wealthier and of higher caste than Maharashtrians).
 
-Daily commutes of three hours or more are common
-
-The state was the center of the caste movement
-
-Combined with rising real estate prices, these have manifested in social segregation
-
-Lower-caste Hindus, especially non-Brahmin Maharashtrians, are more likely to be non-vegetarian
-
-The existence of widespread discrimination in Mumbai's housing market has been well-established in the literature [@Shaban2021], despite recent laws that have attempted to curb the practice [@Koppikar_2023]. However, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper.
-
-This project aims to explore to what extent Dalits and other lower caste groups have been pushed to the margins s
-
-The primary objective of the project is descriptive rather than inferential or predictive
-
-using smaller areal units
-
-[see @BHARATHI2023110951]
+This project hence aims to explore to what extent Dalits, Adivasis, and other lower caste groups have been pushed to the margins of the city, as well as how current demographics of the region reflect the characteristics of immigrating populations. The primary objective of the project is descriptive rather than inferential or predictive, and aims to obtain a spatially-informed understanding of segregation both within Mumbai's exurbs and between the city and its fringes. Spatial segregation in Mumbai's housing has been well-established in the literature [@Shaban2021]; however, little analysis has been conducted on segregation in the wider metropolitan region, outside the boundaries of the city proper. In a city with limited land space, segregation effectively incentivizes those shut out of its restrictive market to either live in slum-like informal tenements or to seek housing in far-flung satellite cities in the MMR. Not coincidentally, real estate prices also tend to decrease as one moves northwards and eastwards from the old city, further pushing lower-income individuals (who are disproportionately lower-caste and/or Muslim) outwards. This has the potential for severe business impacts [see @BHARATHI2023110951] - daily commutes of three hours or more are not uncommon in the region, as a majority of employment tends to be concentrated in industrial areas and business districts in the city proper, even today. There is also evidence that these exurbs are less developed and have reduced access to public services[pre-print from @Asher2023ResidentialSA], further underlining the necessity of this study.
 
 ## 2. Data
 
-The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is an open access repository that aims to link hundreds of Indian datasets comprising socio-economic surveys, censuses, and environmental studies with common geographic identifiers. Owing to the nation's size and diversity, Indian record-keeping is notoriously inconsistent, with formats, naming conventions, and even languages often differing within the same state; SHRUG circumvents this issue through its standardization process. It also obtains a level of geographic granulality that cannot be found in any single government dataset - by splitting the nation into 576,153 uniform areal units termed "shrids" and reaggregating all variables to these, it provides a largely consistent framework by which to analyse different regions at a deeper level than states, districts and sub-districts. It is for this reason that the project utilizes **2011 Population Census Abstract (PCA) and Socio-Economic and Caste Survey (SECC) Data** [@pcindia; @ecindia; @almn2021] over more recent data like the National Family Health Survey from 2019-21 - cleaning the latter to a level acceptable for analysis would have been a months-long project, as it is not currently available in SHRUG. Yielding the granularity desired for our purposes would indeed be an even more Herculean task.
+The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is an open access repository that aims to link hundreds of Indian datasets comprising socio-economic surveys, censuses, and environmental studies with common geographic identifiers. Owing to the nation's size and diversity, Indian record-keeping is notoriously inconsistent, with formats, naming conventions, and even languages often differing within the same state. SHRUG obtains a level of standardization and geographic granularity that cannot be found in any single government dataset - by splitting the nation into 576,153 uniform areal units termed "shrids" and reaggregating all variables to these, it provides a largely consistent framework facilitating analysis at a deeper level than states, districts and sub-districts. This is the primary reason that this project utilizes **2011 Population Census Abstract (PCA), Socio-Economic and Caste Survey (SECC), and Economic Cenus (EC) Data** [@pcindia; @ecindia; @almn2021] over more recent data like the National Family Health Survey from 2019-21 - cleaning the latter to a level acceptable for analysis would have been a months-long project, as it is not currently available in SHRUG.
 
-The 2011 PCA and SECC datasets are the most current census data available for India; although usually conducted decennially, the 2021 census was postponed due to COVID and other political reasons. As stored at the shrid-level in SHRUG, they contain a multitude of variables on employment, occupation, literacy, property ownership, and consumption, as well as demographic information like gender, caste, income, and education status. Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population percentages, home/land ownership shares, average number of rooms in home, and share of households with an income above Rs. 5000/10000 a month. SC/ST are government designations for Dalits and Adivasis - Dalits, commonly known as "Untouchables" outside of India, form the lowest rung of the Indian caste system, historically relegated to the most humiliating occupations and subject to severe societal ostracization, while the Adivasis are tribal groups, who while not affected by considerations of "impurity" as with Dalits, are economically disenfranchised and whose cultural practices are seen as "primitive" by much of the rest of Indian society.
+The 2011 PCA, EC, and SECC datasets are the most current census data available for India; although usually conducted decennially, the 2021 census was postponed due to COVID and other political reasons. As stored at the shrid and subdistrict level in SHRUG, they contain a multitude of variables on employment, occupation, literacy, property ownership, and consumption, as well as demographic information like gender, caste, income, and education status. Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population percentages, home/land ownership shares, and employment/business ownership by different castes. Note that SC/ST are government designations for Dalits and Adivasis.
 
 Surprisingly missing from the dataset was a breakdown of religions and ethnicities in each shrid. This could have provided additional nuance to our analysis, especially when looking at how they intersect with caste; contrary to popular belief, many non-Hindu Indians also have caste distinctions, while an ethnic breakdown could contextualize discrimination in terms of the familiarity of individuals with specific sub-castes not present in their native regions.
 
@@ -55,7 +39,7 @@ As SHRUG stores district/sub-district data separately from shrid-level data, wit
 
 Another issue encountered was that the city proper was only comprised of two shrids, each spanning the Mumbai City and Mumbai Suburban districts respectively. The authors of SHRUG note this as an issue in their documentation - specifically, that breaking up census data into shrids was challenging in and around major cities, given the occasional lack of detail in the census - and this hampered some of the comparative analysis that was planned with regards to segregation in the city vs. the rest of the MMR.
 
-Finally, there were some missing shrids in the SECC datasets as compared to the PCA dataset. The rural and urban phases of the SECC were conducted separately, with survey questions slightly different for each; when attempting to merge both datasets with the MMR shrids computed from PCA data, 42 shrids were not found. As a result, only PCA variables are available for those vs. the full set of PCA and SECC variables for the rest.
+Finally, there were some missing shrids in the EC and SECC datasets as compared to the PCA dataset; specifically, 42 shrids were missing from SECC and another 60 from EC. As a result, only PCA variables are available for those vs. the full set of PCA, EC SECC variables for the rest.
 
 ### 2.2 Exploration
 
@@ -92,8 +76,6 @@ tab |>
         row.names = TRUE, caption = "Caste demography of the MMR vs. India")
 ```
 
-
-
 ```{r echo = FALSE, warning=FALSE}
 
 ggplot() + 
@@ -104,14 +86,6 @@ ggplot() +
   aes(fill = sc_st_prop), color = ifelse(is.na(mmr_shrid$shrid2), "red", NA)) +
   scale_fill_viridis_c() + 
   labs(fill = "Proportion of SC/ST residents") 
-
-
-mmr_shrid |> 
-  filter(is.na(mmr_shrid$shrid2)) |>
-  as_tibble() |>
-  select(-geometry) |>
-  reframe((pc11_pca_p_sc + pc11_pca_p_st) / 
-                                  pc11_pca_tot_p)
 ```
 
 Table 1 displays a breakdown of caste percentages
@@ -146,7 +120,9 @@ Conducting a hypothesis test for Geary's C shows us clear evidence of positive s
 
 #### 3.1.1 Primary Outcome
 
-The primary outcome of this study is the global spatial dissimilarity index, as formulated in [@Reardon_2004], of SC/ST individuals vs. all other individuals. A spatial analog to the dissimilarity index
+The primary outcome of this study is a set of descriptive statistics to describe spatial, caste/tribe-based segregation at a shrid-level.
+
+is the global spatial dissimilarity index, as formulated in \[\@\], of SC/ST individuals vs. all other individuals. A spatial analog to the dissimilarity index
 
 will be tested across different bandwidths
 
@@ -156,23 +132,37 @@ These metrics were calculated using the *seg* package in R, developed in part by
 
 Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using the procedure described in @Feitosa_2007 pp. 309-310, which was computed on a very similar index].
 
-Avoid the "grid" problem - use subdistrict breakup as well??
-
 #### 3.1.2 Secondary Outcomes
+
+The secondary outcome of this study is the same set of spatial statistics, but computed at a subdistrict level.
 
 Tests if the city is split more along income lines than caste, acknowledging the high correlation between the two
 
-Produce a chloropleth of local segregation indices
+Test at subdistrict level
+
+Avoid the "grid" problem - use subdistrict breakup as well??
 
 ### 3.2. Results
 
-## 4. Conclusion and Discussion 
+```{r}
+prim <- tibble(d_sc = c(0.2414745), d_st = c(0.525149), d_comb = c(0.2799382)) |>
+  kable(digits = 3, col.names = c("SC", "ST", "Combined SC/ST"),
+        caption = "Primary Outcome Results - Global Spatial Dissimilarity Index")
+```
 
-The limitations of this study arose primarily from data availability and quality.
-Ideally, this study would have been conducted at the Ward Level
+```{r}
+tibble(d_sc = 0.1023268, d_st = 0.4275618, d_comb = 0.1536606) |>
+  kable(digits = 3, col.names = c("SC", "ST", "Combined SC/ST"),
+        caption = "Secondary Outcome Results")
 
+tibble()
+```
 
-Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. For example, even though Hong's measure meets compositional invariance criteria, it suffers from MAUP issues, something that may be worsened by the alternatingly arbitrary and non-arbitrary basis on which shrids are defined in SHRUG. 
+## 4. Conclusion and Discussion
+
+The limitations of this study arose primarily from data availability and quality. Ideally, this study would have been conducted at the Ward Level
+
+Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. For example, even though Hong's measure meets compositional invariance criteria, it suffers from MAUP issues, something that may be worsened by the alternatingly arbitrary and non-arbitrary basis on which shrids are defined in SHRUG.
 
 {{< pagebreak >}}
 

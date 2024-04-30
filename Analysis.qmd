@@ -233,19 +233,71 @@ ggplot(mmr_shrid_2, aes(x = sqrt((pc11_pca_p_sc + pc11_pca_p_st) /
 
 ```{r seg indices}
 # calculating segregation indices below
-x <- as_Spatial(st_geometry(mmr_shrid_2))
+x <- sf::as_Spatial(st_geometry(mmr_shrid_2))
 
 
-df <- tibble(sc_pop = mmr_shrid_2$pc11_pca_p_sc +  mmr_shrid_2$pc11_pca_p_st, other_pop = mmr_shrid_2$pc11_pca_tot_p - (sc_pop))
+### caste at shrid level
 
-# spseg(x, df, smoothing = "kernel", sigma = 0.03)
+df <- tibble(sc_pop = mmr_shrid_2$pc11_pca_p_st, 
+                 other_pop = mmr_shrid_2$pc11_pca_tot_p - sc_pop)
+
+seg::spseg(x, df, smoothing = "kernel", sigma = 0.03)
+
+seg::dissim(x, df, adjust = TRUE, verbose = TRUE, n2m.args = list(zero.policy = TRUE))
+
+
+### caste at subdist level
+
+x <- as_Spatial(st_geometry(mmr_subdist))
+
+
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_st, other_pop = mmr_subdist$pc11_pca_tot_p - (sc_pop))
+
+seg::dissim(x, df, adjust = TRUE)
+
+seg::spseg(x, df, smoothing = "kernel", sigma = 0.03)
+
+
+### firm ownership at subdist level
+
+
+
+x <- as_Spatial(st_geometry(ec_subdist_mmr))
+
+
+# OBC 
+df <- tibble(obc_pop = ec_subdist_mmr$ec13_count_obc,
+             other_pop = ec_subdist_mmr$ec13_count_all - (obc_pop))
 
 dissim(x, df)
 
 
-# try dissim with larger units? - possible now, data fixed
-# fix districts for mumbai - done
-# try econ census data - done
+# SC/ST 
+df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_sc +  ec_subdist_mmr$ec13_count_st,
+             other_pop = ec_subdist_mmr$ec13_count_all - (sc_pop))
+
+dissim(x, df)
+
+### firm ownership at shrid level
+
+
+x <- as_Spatial(st_geometry(ec_shrid_mmr))
+
+# OBC 
+df <- tibble(obc_pop = ec_shrid_mmr$ec13_count_obc,
+             other_pop = ec_shrid_mmr$ec13_count_all - (obc_pop))
+
+dissim(x, df)
+
+
+# SC/ST 
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_sc +  ec_shrid_mmr$ec13_count_st,
+             other_pop = ec_shrid_mmr$ec13_count_all - (sc_pop))
+
+dissim(x, df)
+
+
+
 
 ```
 
