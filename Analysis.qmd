@@ -231,13 +231,13 @@ ggplot(mmr_shrid_2, aes(x = sqrt((pc11_pca_p_sc + pc11_pca_p_st) /
 
 ```{r seg indices}
 # calculating segregation indices below
-x <- sf::as_Spatial(st_geometry(mmr_shrid_2))
+x <- sf::as_Spatial(st_geometry(mmr_shrid))
 
 
 ### caste at shrid level
 
-df <- tibble(sc_pop = mmr_shrid_2$pc11_pca_p_st, 
-                 other_pop = mmr_shrid_2$pc11_pca_tot_p - sc_pop)
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_sc, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
 
 seg::spseg(x, df, smoothing = "kernel", sigma = 0.03)
 
@@ -296,5 +296,86 @@ dissim(x, df)
 
 
 
+
+
+```
+
+```{r}
+
+x <- sf::as_Spatial(st_geometry(mmr_shrid))
+
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_st, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+reard_st_prim <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_st_prim, "reard_st.rds")
+
+df <- tibble(sc_pop = mmr_shrid_2$pc11_pca_p_sc, 
+                 other_pop = mmr_shrid_2$pc11_pca_tot_p - sc_pop)
+reard_sc_prim <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_sc_prim, "reard_sc.rds")
+
+
+x <- sf::as_Spatial(st_geometry(ec_shrid_mmr))
+
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_obc, 
+                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+
+reard_obc <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_obc, "reard_obc.rds")
+
+
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_sc + ec_shrid_mmr$ec13_count_st, 
+                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+
+reard_comb <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_comb, "reard_comb.rds")
+
+```
+
+```{r }
+# reard measures sec
+
+
+x <- sf::as_Spatial(st_geometry(mmr_dist))
+
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_st, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+reard_st_prim <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_st_prim, "reard_st_sec.rds")
+
+df <- tibble(sc_pop = mmr_dist2$pc11_pca_p_sc, 
+                 other_pop = mmr_dist2$pc11_pca_tot_p - sc_pop)
+reard_sc_prim <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_sc_prim, "reard_sc_sec.rds")
+
+ec_subdist_mmr <- read_rds("data/cleaned/ec_subdist_mmr.rds")
+
+
+
+
+x <- sf::as_Spatial(st_geometry(ec_subdist_mmr))
+
+df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_obc, 
+                 other_pop = ec_subdist_mmr$ec13_count_all - sc_pop)
+
+reard_obc <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_obc, "reard_obc_sec.rds")
+
+
+df <- tibble(sc_pop = ec_subdist_mmr$ec13_count_sc + ec_subdist_mmr$ec13_count_st, 
+                 other_pop = ec_subdist_mmr$ec13_count_all - sc_pop)
+
+reard_comb <- as.list(seg::spseg(x, df, smoothing = "kernel"))
+
+write_rds(reard_comb, "reard_comb_sec.rds")
 
 ```

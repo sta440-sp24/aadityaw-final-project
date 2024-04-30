@@ -46,7 +46,7 @@ Finally, there were some missing shrids in the EC and SECC datasets as compared 
 ```{r echo  =FALSE, warning=FALSE}
 mmr_shrid <- readRDS("data/cleaned/mmr_shrid.rds")
 
-all_surveys_mmr_shrid <- readRDS("data/cleaned/all_surveys_mmr_shrid.rds")
+ec_shrid_mmr <- readRDS("data/cleaned/all_surveys_mmr_shrid.rds")
 
 
 mmr_subdist <- readRDS("data/cleaned/mmr_subdist.rds")
@@ -81,14 +81,14 @@ Table 1 demonstrates that immigration to Mumbai and the MMR has not been reflect
 
 ```{r}
 
-tab_2 <- all_surveys_mmr_shrid |>
+tab_2 <- ec_shrid_mmr |>
   filter(is.na(shrid2)) |>
   summarize(sc_pop = (sum(ec13_count_sc) / sum(ec13_count_all))* 100,
             st_pop = (sum(ec13_count_st) / sum(ec13_count_all)) *100,
             obc_pop = (sum(ec13_count_obc) / sum(ec13_count_all)) * 100) |>
   as_tibble() |>
   select(-geometry) |>
-  rbind(all_surveys_mmr_shrid |>
+  rbind(ec_shrid_mmr |>
           filter(!is.na(shrid2)) |>
   summarize(sc_pop = (sum(ec13_count_sc) / sum(ec13_count_all))* 100,
             st_pop = (sum(ec13_count_st) / sum(ec13_count_all)) *100,
@@ -140,7 +140,7 @@ broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_
                                   mmr_shrid_2$pc11_pca_tot_p, A)) |>
   select(estimate1, p.value) |>
   kable(digits = 3, col.names = c("Geary's C", "P-value"),
-        caption = "Shrid-level Geary's C test: SC/ST population percentages") |>
+        caption = "Shrid-level Geary's C test - SC/ST population percentages") |>
   kableExtra::kable_styling(font_size = 9)
   
 ```
@@ -153,9 +153,9 @@ Conducting a hypothesis test for Geary's C shows us clear evidence of positive s
 
 #### 3.1.1 Primary Outcome
 
-The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index \[@Morrill_1992\], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others.
+The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index [@Morrill_1992], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others.
 
-The conventional aspatial global dissimilarity index, although still widely used in sociological, economics, and public health research, has long been considered insufficient to accurately capture the effects of spatial correlation. This is primarily due to the so-called "checkerboard problem" [@Reardon_2004], where high exposure (i.e. at small distances from each other and easily able to interact), but non-clustered distributions of two groups can appear more segregated than they are. In a city like Mumbai, where expansions of its territory and local geography have been shaped significantly by different waves of immigration, this could greatly affect our estimates, so must be accounted for. The specific choice of Reardon and O'Sullivan's measure was because a similar, although not identical, kernel-based spatial index has been used in the Indian context earlier to some success [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru using @Feitosa_2007's index]. However, neither the aspatial index nor Reardon and O'Sullivan's global dissimilarity index satisfy the compositional invariance criterion [@Barron_Hall_Rich_Arias_2023; @Reardon_2004] - the implications of this for the analysis of the region are discussed in further detail in the Evaluation. Reardon and O'Sullivan also require tuning of the kernel/smoothing algorithm, which I was unfamiliar with and had to rely on the software's best guess. Therefore, I also included Morrill's measure, which is a more easily intepretable, direct modification of the aspatial index, but suffers from the MAUP (see Secondary Outcome for details).
+The conventional aspatial global dissimilarity index, although still widely used in sociological, economics, and public health research, has long been considered insufficient to accurately capture the effects of spatial correlation. This is primarily due to the so-called "checkerboard problem" [@Reardon_2004], where high exposure (i.e. at small distances from each other and easily able to interact), but non-clustered distributions of two groups can appear more segregated than they are. In a city like Mumbai, where expansions of its territory and local geography have been shaped significantly by different waves of immigration, this could greatly affect our estimates, so must be accounted for. The specific choice of Reardon and O'Sullivan's measure was because a similar, although not identical, kernel-based spatial index has been used in the Indian context earlier to some success [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru using @Feitosa_2007's index]. However, neither the aspatial index nor Reardon and O'Sullivan's global dissimilarity index fully satisfy the compositional invariance criterion [@Barron_Hall_Rich_Arias_2023; @Reardon_2004] - the implications of this for the analysis of the region are discussed in further detail in the Evaluation. Reardon and O'Sullivan also require tuning of the kernel/smoothing algorithm, which I was unfamiliar with and had to rely on the software's best guess. Therefore, I also included Morrill's measure, which is a more easily intepretable, direct modification of the aspatial index, but suffers from the MAUP (see Secondary Outcome for details).
 
 All of these metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As *seg* has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, I used an older version of the package available on the archive, for which the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
 
@@ -163,29 +163,165 @@ Significance will be tested using a pseudo-significance "p-value" measure, compu
 
 #### 3.1.2 Secondary Outcome
 
-The secondary outcome of this study is the same set of spatial statistics, but computed at the census' sub-district level. This is primarily to account for potential variability in results resulting from the modifiable areal unit problem (MAUP), also known as the "grid" problem [@Feitosa_2007]. Most spatial data is stored in an areal format - indeed, so was the data for this study - but the exact choice of area unit, including its shape and its size, can have large impacts on how one estimates segregation. This is especially true for data where we can only compute a simple spatial weight matrix to quantify interactions between areal units, as is the case for our data, rather than an intensity of interaction function. For example, smaller units are likely to be more homogeneous so could show a smaller segregation effect than larger ones. Neither the aspatial or Morrill's measure avoid this issue, and although Reardon and O'Sullivan largely avoid it through kernel-based population estimates, it may still be informative to see how estimate differ.
+The secondary outcome of this study is the same set of spatial statistics, but computed at the census' sub-district level. This is primarily to account for potential variability in results resulting from the modifiable areal unit problem (MAUP), also known as the "grid" problem [@Feitosa_2007]. Most spatial data is stored in an areal format - indeed, so was the data for this study - but the exact choice of area unit, including its shape and its size, can have large impacts on how one estimates segregation. This is especially true for data where we can only compute a simple spatial weight matrix to quantify interactions between areal units, as is the case for our data, rather than an intensity of interaction function. For example, smaller units are likely to be more homogeneous so could show a smaller segregation effect than larger ones. Neither the aspatial index or Morrill's measure avoid this issue, and although Reardon and O'Sullivan largely avoid it through kernel-based population estimates, it may still be informative to see how estimates differ.
 
 ### 3.2. Results
 
 ```{r}
-prim <- tibble(d_sc = c(0.2414745), d_st = c(0.525149), d_comb = c(0.2799382)) |>
-  kable(digits = 3, col.names = c("SC", "ST", "Combined SC/ST"),
-        caption = "Primary Outcome Results - Shrid-level Indices")
+# calculating segregation indices below - primary
+
+### morrill_sc
+
+x <- sf::as_Spatial(st_geometry(mmr_shrid))
+
+
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_sc, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+morrill_sc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+### morilll_st
+
+
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_st, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+morrill_st <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+# reard measures 
+
+
+reard_st <- read_rds("reard/reard_st.rds")
+reard_sc <- read_rds("reard/reard_sc.rds")
+
+
+# morill_comb firm 
+x <- sf::as_Spatial(st_geometry(ec_shrid_mmr))
+
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_sc + ec_shrid_mmr$ec13_count_st, 
+                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+
+morrill_comb <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+# morill_obc firm
+
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_obc, 
+                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+
+morrill_obc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+# reard measures 
+
+reard_obc <- read_rds("reard/reard_obc.rds")
+
+reard_comb <- read_rds("reard/reard_comb.rds")
+
+
 ```
 
 ```{r}
-tibble(d_sc = 0.1023268, d_st = 0.4275618, d_comb = 0.1536606) |>
-  kable(digits = 3, col.names = c("SC", "ST", "Combined SC/ST"),
-        caption = "Secondary Outcome Results - Subdistrict-level Indices")
+prim <- tibble(morrill_d = c(morrill_sc$d, morrill_st$d, morrill_comb$d, morrill_obc$d), 
+               morilll_dm =  c(morrill_sc$dm, morrill_st$dm, morrill_comb$dm, morrill_obc$dm),
+               reard_d = c(reard_sc$d, reard_st$d, reard_comb$d, reard_obc$d),
+               reard_r = c(reard_sc$r, reard_st$r, reard_comb$r, reard_obc$r),
+               reard_h = c(reard_sc$h, reard_st$h, reard_comb$h, reard_obc$h)) 
 
-tibble()
+rownames(prim) <- c("SC pop vs. all", "ST pop vs. all", "SC/ST firm ownership vs. all", 
+                    "OBC firm ownership vs. all")
+
+prim |>
+  kable(digits = 3, col.names = c("Aspatial D Index", "Morrill's D Index", 
+                                  "Reard/O'Sull D Index", "Reard/O'Sull R Index",
+                                  "Reard/O'Sull H Index"),
+        caption = "Primary Outcome Results - Shrid-level Indices")
+
 ```
+
+
+```{r}
+# calculating segregation indices below - secondary
+
+### morrill_sc
+
+x <- sf::as_Spatial(st_geometry(mmr_subdist))
+
+
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_sc, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
+
+morrill_sc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+### morilll_st
+
+
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_st, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
+
+morrill_st <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+# reard measures 
+
+# reard_st <- read_rds("reard/reard_st_sec")
+# 
+# reard_st <- read_rds("reard/reard_sc_sec")
+
+
+# morill_comb firm 
+x <- sf::as_Spatial(st_geometry(ec_shrid_mmr))
+
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_sc + ec_shrid_mmr$ec13_count_st, 
+                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+
+morrill_comb <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+# morill_obc firm
+
+df <- tibble(sc_pop = ec_shrid_mmr$ec13_count_obc, 
+                 other_pop = ec_shrid_mmr$ec13_count_all - sc_pop)
+
+morrill_obc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TRUE))
+
+# reard measures 
+
+# reard_obc <- read_rds("reard/reard_obc_sec")
+# 
+# reard_comb <- read_rds("reard/reard_comb_sec")
+
+
+```
+
+
+
+
+```{r}
+sec <- tibble(morrill_d = c(morrill_sc$d, morrill_st$d, morrill_comb$d, morrill_obc$d), 
+               morilll_dm =  c(morrill_sc$dm, morrill_st$dm, morrill_comb$dm,
+                               morrill_obc$dm)) 
+
+rownames(sec) <- c("SC pop vs. all", "ST pop vs. all", "SC/ST firm ownership vs. all", 
+                    "OBC firm ownership vs. all")
+sec |>
+  kable(digits = 3, col.names = c("Aspatial D Index", "Morrill's D Index"),
+        caption = "Secondary Outcome Results - District-level Indices")
+```
+
+
+
+
 
 ## 4. Conclusion and Discussion
 
-The limitations of this study arose primarily from data availability and quality. Ideally, this study would have been conducted at the Ward Level
+Many of the limitations of this study arose from data availability and quality. Ideally, this study would have been conducted at the Ward Level, which would haven given us granularity for specific neighborhoods in the region that have sociological and historical value. 
 
-Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. For example, even though Hong's measure meets compositional invariance criteria, it suffers from MAUP issues, something that may be worsened by the alternatingly arbitrary and non-arbitrary basis on which shrids are defined in SHRUG.
+It would would also have been conducted with newer data
+
+The fact that the city proper only achieved the granularity of two shrids may have affeted our 
+
+Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. tHE S
+
+Tehc 
+
+
 
 {{< pagebreak >}}
 
