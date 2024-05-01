@@ -1,8 +1,10 @@
 ---
-title: "Housing market and employment discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based segregation"
+title: "Housing market and asset ownership discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based and religious segregation"
 author: "Aaditya Warrier"
 bibliography: references.bib
-format: pdf
+format: 
+  pdf:
+    fontsize: 10.5pt
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -29,7 +31,7 @@ This project hence aims to explore to what extent Dalits, Adivasis, and other lo
 
 The data used in this study comes from The Socioeconomic High-resolution Rural-Urban Geographic Platform for India Project (abbrv. SHRUG). SHRUG is an open access repository that aims to link hundreds of Indian datasets comprising socio-economic surveys, censuses, and environmental studies with common geographic identifiers. Owing to the nation's size and diversity, Indian record-keeping is notoriously inconsistent, with formats, naming conventions, and even languages often differing within the same state. SHRUG obtains a level of standardization and geographic granularity that cannot be found in any single government dataset - by splitting the nation into 576,153 uniform areal units termed "shrids" and reaggregating all variables to these, it provides a largely consistent framework facilitating analysis at a deeper level than states, districts and sub-districts. This is the primary reason that this project utilizes **2011 Population Census Abstract (PCA), Socio-Economic and Caste Survey (SECC), and Economic Cenus (EC) Data** [@pcindia; @ecindia; @almn2021] over more recent data like the National Family Health Survey from 2019-21 - cleaning the latter to a level acceptable for analysis would have been a months-long project, as it is not currently available in SHRUG.
 
-The 2011 PCA, EC, and SECC datasets are the most current census data available for India; although usually conducted decennially, the 2021 census was postponed due to COVID and other political reasons. As stored at the shrid and subdistrict level in SHRUG, they contain a multitude of variables on employment, occupation, literacy, property ownership, and consumption, as well as demographic information like gender, caste, income, and education status. Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population percentages, home/land ownership shares, and employment/business ownership by different classes (including OBCs). Note that SC/ST are government designations for Dalits and Adivasis, while OBCs refer to a range of lower and middle castes considered socio-economically "backward".
+The 2011 PCA, EC, and SECC datasets are the most current census data available for India; although usually conducted decennially, the 2021 census was postponed due to COVID and other political reasons. As stored at the shrid and subdistrict level in SHRUG, they contain a multitude of variables on employment, occupation, literacy, property ownership, and consumption, as well as demographic information like gender, caste, income, and education status. Key variables of interest were the Scheduled Caste/Scheduled Tribe (SC/ST) population percentages, home/land ownership shares, and employment/business ownership by different classes (including OBCs). Note that SC/ST are government designations for Dalits and Adivasis, while OBCs refer to a range of lower and middle classes considered socio-economically "backward".
 
 Surprisingly missing from the dataset was a breakdown of religions and ethnicities in each shrid. This could have provided additional nuance to our analysis, especially when looking at how they intersect with caste; contrary to popular belief, many non-Hindu Indians also have caste distinctions, while an ethnic breakdown could contextualize discrimination in terms of the familiarity of individuals with specific sub-castes not present in their native regions.
 
@@ -73,8 +75,11 @@ rownames(tab) <- c("Mumbai (city proper)", "MMR (excluding city proper)", "Mahar
 
 tab |>
   rownames_to_column() |>
-  kable(digits = 2, col.names = c("Region", "SC Population (% of total)", "ST Population (% of total)", "Combined SC/ST Population (% of total)"), 
+  kable(digits = 2,
+        col.names = c("Region", "SC Population (% of total)", "ST Population (% of total)", "Combined SC/ST Population (% of total)"), 
         row.names = TRUE, caption = "Caste demography of the MMR vs. India")
+  
+
 ```
 
 Table 1 demonstrates that immigration to Mumbai and the MMR has not been reflective of the broader caste population of India or of the state. This is not particularly surprising for the ST population, who primarily inhabit forested regions, but a marked difference must be noted in the SC population, who theoretically should be evenly spread out. What is notable for STs is the stark difference in population percentages between the city proper and the rest of the urban region, indicating their exclusion from the city.
@@ -106,6 +111,7 @@ tab_2 |>
                                   "OBC (% of total firms)"), 
         row.names = TRUE, caption = "Firm ownership by caste/class in the MMR")  |>
   kableExtra::kable_styling(font_size = 9)
+  
 ```
 
 ```{r echo = FALSE, warning=FALSE, fig.size = 10}
@@ -139,7 +145,7 @@ A = spdep::mat2listw(st_touches(mmr_shrid_2, sparse=FALSE), zero.policy = TRUE)
 broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_p_st) / 
                                   mmr_shrid_2$pc11_pca_tot_p, A)) |>
   select(estimate1, p.value) |>
-  kable(digits = 3, col.names = c("Geary's C", "P-value"),
+  kable(digits = 3, format = "latex", booktabs = T, col.names = c("Geary's C", "P-value"),
         caption = "Shrid-level Geary's C test - SC/ST population percentages") |>
   kableExtra::kable_styling(font_size = 9)
   
@@ -153,7 +159,7 @@ Conducting a hypothesis test for Geary's C shows us clear evidence of positive s
 
 #### 3.1.1 Primary Outcome
 
-The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index [@Morrill_1992], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others. Thes statistics are theoretically bounded between 0 and 1, with 1 being some measure of perfect segregation/no diversity and 0 being no segregation/perfect diversity (elaborated upon in Results).
+The primary outcome of this study is a set of segregation statistics to spatially describe caste/tribe-based segregation in the MMR at a shrid-level. These will comprise of the aspatial global dissimilarity index, Reardon and O'Sullivan's set of surface-based spatial dissimilarity indices [@Reardon_2004], and Morrill's areal-based, spatially-adjusted dissimilarity index [@Morrill_1992], comparing SC and ST population percentages vs. all other individuals as well as firm ownership for SC, ST, and OBC populations vs. all others. These statistics are theoretically bounded between 0 and 1, with 1 being some measure of perfect segregation/no diversity and 0 being no segregation/perfect diversity (elaborated upon in Results). OBC statistics will be used as a proxy for religious discrimination - high percentages of religious minorities fall in this class.
 
 The conventional aspatial global dissimilarity index, although still widely used, has long been considered insufficient to accurately capture the effects of spatial correlation. This is primarily due to the so-called "checkerboard problem" [@Reardon_2004], where high exposure (i.e. at small distances from each other and easily able to interact), but non-clustered distributions of two groups can appear more segregated than they are. In a city like Mumbai, where expansions of its territory and local geography have been shaped significantly by different waves of immigration, this could greatly affect our estimates. The specific choice of Reardon and O'Sullivan's (henceforth abbrv. RS) measure was because a similar, although not identical, kernel-based spatial index has been previously used in the Indian context to some success [see @Haque_2021, which explores spatial segregation in Kolkata and Bengaluru using @Feitosa_2007's index]. However, neither the aspatial index nor the RS global dissimilarity index fully satisfy the compositional invariance criterion [@Barron_Hall_Rich_Arias_2023; @Reardon_2004] - the implications of this for the analysis of the region are debated in further detail in the Discussion section. RS also requires tuning of the kernel/smoothing algorithm, which I was unfamiliar with and had to rely on the software's best guess. Therefore, I also included Morrill's measure, which is a more easily intepretable, direct modification of the aspatial index, but suffers from the MAUP (see Secondary Outcome for details).
 
@@ -231,14 +237,15 @@ rownames(prim) <- c("SC residents vs. all", "ST residents vs. all", "SC/ST firm 
 
 prim |>
   rownames_to_column() |>
-  kable(digits = 3, col.names = c("Comparison Type", "Aspatial D Index", "Morrill's D Index",
+  kable(digits = 3,
+        col.names = c("Comparison Type", "Aspatial D Index", "Morrill's D Index",
                                   "Reard/O'Sull D Index", "Reard/O'Sull R Index",
                                   "Reard/O'Sull H Index"),
         caption = "Primary Outcome Results - Shrid-level Indices")
 
 ```
 
-First, we can note that the spatial indices are uniformly lower than the aspatial index, underlining the importance of considering spatial correlation when examining segregation. The aspatial index seems to display clear segregation for all comparisons. Glancing at our results, however, we see generally inconsistent results with RS's *R* and *H* indices, with some negative values as well. *R* refers to how much less diverse an individual's local environment is, on average, as opposed to the global environment; *H* is an entropy-based measure. While a value of 1 would imply a mono-caste/class/tribe shrid, a negative value for either implies that shrids are more diverse than the global environment, on average. This is certainly an unintuitive finding for both SC residential and SC/ST firm ownership discrimination and will be dissected further in the Discussion Section.
+First, we can note that the spatial indices are uniformly lower than the aspatial index, underlining the importance of considering spatial correlation when examining segregation. The aspatial index seems to display clear segregation for all comparisons. Glancing at our results, however, we see generally inconsistent results with RS's *R* and *H* indices, with some negative values as well. *R* refers to how much less diverse an individual's local environment is, on average, as opposed to the global environment; *H* is an entropy-based measure of the same. While a value of 1 would imply a mono-caste/class/tribe shrid, a negative value for either implies that shrids are more diverse than the global environment, on average. This is certainly an unintuitive finding for both SC residential and SC/ST firm ownership discrimination and will be dissected further in the Discussion Section.
 
 With these caveats in mind, we still observe a value of approximately 0.1 for Morrill's Dissimilarity index for the SC population, a result with "pseudo-significant" p-value = 0.01 (see appendix). However, the strongest evidence is undoubtedly that for Scheduled Tribes, who have the highest levels of segregation in the MMR across all metrics. Using RS's *R* index, relatively easier to interpret, we see that STs neighborhoods will be roughly 11.4% less diverse/have a 11.4% higher concentration of STs than average for the MMR. Similarly, Morrill's D Index indicates 28.4% of the MMR's total ST population would have to move to achieve a perfectly even distribution (i.e. be well-integrated), a staggering number. There statistics were also pseudo-significant by our permutation test.
 
@@ -299,8 +306,6 @@ morrill_obc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = T
 
 ```
 
-
-
 ```{r}
 sec <- tibble(morrill_d = c(morrill_sc$d, morrill_st$d, morrill_comb$d, morrill_obc$d), 
                morilll_dm =  c(morrill_sc$dm, morrill_st$dm, morrill_comb$dm,
@@ -312,28 +317,22 @@ sec |>
   rownames_to_column() |>
   kable(digits = 3, col.names = c("Comparison Type", 
                                   "Aspatial D Index", "Morrill's D Index"),
-        caption = "Secondary Outcome Results - District-level Indices")
+        caption = "Secondary Outcome Results - District-level Indices") |>
+  kableExtra::kable_styling()
 ```
 
 On repeated efforts, Reardon's and O' Sullivan's measures failed to compute for any of our desired secondary comparisons. This may owe to the number of subdistricts simply being too small to obtain an accurate kernel estimation of the population density function. However, examining the remaining indices, very similar results are seen to the primary outcome, and no conclusions are majorly affected, showing that this analysis is fairly robust to the "grid size" problem. The smaller values overall for subdistrict indices indicate that at a more granular level, population compositions are actually more heterogeneous, which may signal the necessity of an even smaller unit of analysis than shrids for the most accurate results.
 
-
 ## 4. Conclusion and Discussion
 
-This project's analysis showed less segregation against SC individuals than initially may have been expected, but still displayed convincing evidence 
+This project's analysis showed less segregation against SC individuals than initially may have been expected, but still displayed convincing evidence for the segregation of STs. In a city where deforestation has accelerated significantly due to infrastructure development and new construction[@Pathak_2019; @Singh_2022], this is a particular meaningful finding, as these swamp/forested areas are historically home to Kolis, many subgroups of whom are STs. As Figure 1 displayed, a higher concentration of SC/ST are found outside the city; while a good portion of this is in forested areas, a high concentration can be seen in the exurban centres of Badlapur/Ambarnath (far east of the city), indicating possible displacement. 
 
+Although OBC segregation in percentages of firm ownership was seen, this was a admittedly a somewhat arbitrary measure to use to analyze housing discrimination, speaking more to asset ownership patterns. Conflating OBC membership with lower/middle castes may also be a shaky assumption to make - the definition of the class has been increasingly diluted due to upper and upper-middle Hindu castes lobbying governments for their inclusion in it (e.g. to receive affirmative action benefits), such that up to 30-40% of Hindu communities fall in the class.
+As such, the observed result may speak more to class-based rather than caste/religious-based segregation, somewhat outside the initial scope of the study but still a notable finding. It serves best as a standalone measure of OBC segregation compared to all other castes and has less utility to as a direct comparison to SCs or STs.
 
-Many of the limitations of this study arose from data availability and quality. Ideally, this study would have been conducted at the Ward Level, which would haven given us granularity for specific neighborhoods in the region that have sociological and historical value. 
+Many of the limitations of this study arose from data availability and quality. The fact that the city proper only consisted of two shrids affected the ability to make accurate intra-city and city/exurb comparisons. For example, if we did have more granularity, we might have observed conglomerations of STs in areas of the city that are heavily forested like Aarey Colony, Gorai, etc. Further, with the bulk of the MMRs population in the city, more clear cut segregation of SCs may have been observed as well. Ideally, a comparison of segregation indices within the city and outside would also have been undertaken. Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. Specifically, for the set of RS measures, compositional invariance - the idea that a segregation index should return the same value regardless of the actual composition of a population by subgroup - does not hold, which means that they require a uniform population distribution across space, an assumption that certainly does not hold for the MMR. This may be why we observed such low values at the shrid-level for all groups, compounded by the asymmetry in distribution arising from the 2-shrid problem. 
 
-It would also have been conducted with newer data
-
-The fact that the city proper only achieved the granularity of two shrids may have affeted our 
-
-Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. tHE S
-
-Tehc 
-
-Finally, we must rbitrary measure of firm ownership 
+In the future, this study could be conducted at the Ward Level, which would give us granularity for specific neighborhoods in the region that have sociological and historical value. This information was not readily available in SHRUG, but is available in raw census data if cleaned - a task like this may be more suitable for a thesis project. It would also be interesting to examine specific religions and ethnic breakdowns for a fuller picture, or better still, look at specific sub-castes and their segregation, especially with the recent groundbreaking caste surveys conducted by states like Bihar. Finally, if the 2-shrid problem was solved, re-computing RS measures would give us a better picture of the landscape of discrimination against SCs.
 
 {{< pagebreak >}}
 
@@ -370,3 +369,12 @@ ggplot() +
 ```
 
 **Modifications to seg**: In dissim.internals, all do.call function calls called their functions with their names in quotes (i.e. "spdep::poly2nb" instead of spdep::poly2nb), which prevented dissim from working correctly. I changed this to the non-quoted version, which made the package work.
+
+```{r}
+```
+
+An example of the permutation test for which p-values were computed can be found below. This is for the SC vs. all comparison of population concentration:
+
+```{r}
+# OasisR::ResamplePlot(xtest) 
+```

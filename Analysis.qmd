@@ -390,7 +390,7 @@ df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_st,
 xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
                        sampleunit = 'unit', spatobj = x)
 
-xtest$Summary
+mor_test_st_sub <- xtest$Summary[1, ]
 OasisR::ResamplePlot(xtest)
 ```
 
@@ -401,7 +401,8 @@ df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_sc,
 xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
                        sampleunit = 'unit', spatobj = x)
 
-xtest$Summary
+mor_test_sc_sub <- xtest$Summary[1, ]
+
 OasisR::ResamplePlot(xtest)
 ```
 
@@ -415,10 +416,33 @@ df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_sc,
 xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
                        sampleunit = 'unit', spatobj = x)
 
-xtest$Summary
+mor_test_sc <- xtest$Summary[1, ]
 
 
 OasisR::ResamplePlot(xtest)
+```
+
+```{r}
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_st, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
+                       sampleunit = 'unit', spatobj = x)
+
+
+mor_test_sc <- xtest$Summary[1, ]
+```
+
+
+```{r}
+df <- tibble(sc_pop = mmr_shrid$pc11_pca_p_st, 
+                 other_pop = mmr_shrid$pc11_pca_tot_p - sc_pop)
+
+xtest <- OasisR::ResampleTest(df, fun ='multispatseg', simtype = 'MonteCarlo', 
+                       sampleunit = 'unit', spatobj = x)
+
+
+reard_test_st <- xtest$Summary[1, ]
 ```
 
 
