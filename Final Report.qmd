@@ -166,7 +166,7 @@ The conventional aspatial global dissimilarity index, although still widely used
 
 These metrics were calculated using the *seg* package in R, developed in part by O'Sullivan. As *seg* has been temporarily unavailable on CRAN since Feb 2024 due to dependency issues, I used an older version of the package available on the archive, for which the tar.gz can be found in the project repo. I also had to update some code in the package itself, as some lines were outdated given changes in syntax for some R functions; these changes are described in the Appendix.
 
-Significance will be tested using a pseudo-significance "p-value" measure, computed on random permutation tests of dissimilarity across different spatial arrangements of the region [using a procedure similar to @Feitosa_2007 pp. 309-310]. This will be conducted using the *OasisR* package - as this package depended on *seg*, it is also no longer available on CRAN, so an archived version from Dec 2023 has been used.
+Significance will be tested using a pseudo-significance "p-value" measure, computed on a Monte Carlo simulation of dissimilarity using random spatial arrangements vs. the population data [using a procedure similar to @Feitosa_2007 pp. 309-310]. This will be conducted using the *OasisR* package - as this package depended on *seg*, it is also no longer available on CRAN, so an archived version from Dec 2023 was used.
 
 #### 3.1.2 Secondary Outcome
 
@@ -248,7 +248,7 @@ prim |>
 
 First, we can note that the spatial indices are uniformly lower in value than the aspatial index, underlining the importance of considering spatial correlation when examining segregation. The aspatial index seems to display clear segregation for all comparisons. Glancing at our results, however, we see generally inconsistent results with RS's *R* and *H* indices, with some negative values as well. *R* refers to how much less diverse an individual's local environment is, on average, as opposed to the global environment; *H* is an entropy-based measure of the same. While a value of 1 would imply a mono-caste/class/tribe shrid, a negative value for either implies that shrids are more diverse than the global environment, on average. This is certainly an unintuitive finding for both SC residential and SC/ST firm ownership discrimination and will be dissected further in the Discussion Section.
 
-With these caveats in mind, we still observe a value of approximately 0.1 for Morrill's Dissimilarity index for the SC population, a result with "pseudo-significant" p-value = 0.01 (see appendix). However, the strongest evidence is undoubtedly that for Scheduled Tribes, who have the highest levels of segregation in the MMR across all metrics. Using RS's *R* index, relatively easier to interpret, we see that STs neighborhoods will be roughly 11.4% less diverse/have a 11.4% higher concentration of STs than average for the MMR. Similarly, Morrill's D Index indicates 28.4% of the MMR's total ST population would have to move to achieve a perfectly even distribution (i.e. be well-integrated), a staggering number. There statistics were also pseudo-significant by our permutation test.
+With these caveats in mind, we still observe a value of approximately 0.1 for Morrill's Dissimilarity index for the SC population, a result with "pseudo-significant" p-value = 0.01 (see Table 6 in appendix). However, the strongest evidence is undoubtedly that for Scheduled Tribes, who have the highest levels of segregation in the MMR across all metrics. Using RS's *R* index, relatively easier to interpret, we see that STs neighborhoods will be roughly 11.4% less diverse/have a 11.4% higher concentration of STs than average for the MMR. Similarly, Morrill's D Index indicates 28.4% of the MMR's total ST population would have to move to achieve a perfectly even distribution (i.e. be well-integrated), a staggering number. There statistics were also pseudo-significant by our permutation test.
 
 Finally, when examining OBC firm ownership statistics, we see a sharp drop-off between the aspatial dissimilarity value vs. Morrill's dissimilarity. Intutively, this makes sense - a large proportion of native Maharashtrians and Gujaratis fall under the OBC designation, and their longer history in the city may have led to more distinct enclaves and spatial arrangements. Intestingly, OBC's segregation, at least when examined on a firm ownership basis, seems roughly equal to or slightly higher than SC segregation, with RS measures more consistent as well. However, it is unclear how valid this comparison is, given the conceptual differences between population concentration and capital ownership and the fact that OBCs own capital at a far higher rate, as previously mentioned; this utility of this segregation measure is discussed further in the Discussion section.
 
@@ -370,11 +370,37 @@ ggplot() +
 
 **Modifications to seg**: In dissim.internals, all do.call function calls called their functions with their names in quotes (i.e. "spdep::poly2nb" instead of spdep::poly2nb), which prevented dissim from working correctly. I changed this to the non-quoted version, which made the package work.
 
+
 ```{r}
+mor_test_ec <- read_rds("perm_test/mor_test_ec.rds")
+mor_test_sc <- read_rds("perm_test/mor_test_sc.rds")
+mor_test_st <- read_rds("perm_test/mor_test_st.rds")
+mor_test_sc_sub <- read_rds("perm_test/mor_test_sc_sub.rds")
+mor_test_st_sub <- read_rds("perm_test/mor_test_st_sub.rds")
+mor_test_ec_obc_sub <- read_rds("perm_test/mor_test_ec_obc_sub.rds")
+mor_test_ec_sub <- read_rds("perm_test/mor_test_ec_sub.rds")
+mor_test_ec_obc <- read_rds("perm_test/mor_test_ec_obc.rds")
+
 ```
 
-An example of the permutation test for which p-values were computed can be found below. This is for the SC vs. all comparison of population concentration:
 
 ```{r}
-# OasisR::ResamplePlot(xtest) 
+rbind(mor_test_sc, mor_test_st, mor_test_sc_sub, mor_test_st_sub, mor_test_ec, mor_test_ec_sub, mor_test_ec_obc, mor_test_ec_obc) |>
+  select(Var, P.Value) |>
+  kable(caption = "P-values for spatial statistics (only evaluable for Morrill's D)",
+        col.names = c("Comparison", "P-value"))
+```
+
+An example of the permutation test for which p-values were computed can be found below. This is for the ST vs. all comparison at the subdist level:
+
+```{r message=FALSE}
+x <- sf::as_Spatial(mmr_subdist)
+
+df <- tibble(sc_pop = mmr_subdist$pc11_pca_p_st, 
+                 other_pop = mmr_subdist$pc11_pca_tot_p - sc_pop)
+
+xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo', 
+                       sampleunit = 'unit', spatobj = x)
+
+OasisR::ResamplePlot(xtest) 
 ```
