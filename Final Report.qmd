@@ -1,5 +1,5 @@
 ---
-title: "Housing market and asset ownership discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based and religious segregation"
+title: "Housing market discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based and religious segregation"
 author: "Aaditya Warrier"
 bibliography: references.bib
 mainfont: Garamond
@@ -37,7 +37,7 @@ The 2011 PCA and EC datasets are the most current census data available for Indi
 
 ### 2.1 Data Cleaning
 
-As SHRUG has no linking variables between district/sub-district data and shrid-level data, , finding the specific shrids that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level sub-districts. To rectify this problem as much as possible, the spatial intersection (using the st_interescts predicate) between the most relevant sub-districts of the MMR and all shrids in the PCA data was computed. This, however, missed out on a few areas of interest, most notably the majority of the municipal council of Khopoli, while including a few parcels of rural land that were not relevant. The cleaned dataset contained 1273 shrids with a population totaling roughly 22.1 million - this was deemed an acceptable enough difference from the true population of 22.8 million. 
+As SHRUG has no linking variables between district/sub-district data and shrid-level data, , finding the specific shrids that comprised the MMR outside of the city proper proved a challenge. This was compounded by the fact that the MMR is defined by the Municipal Corporation and Councils that comprise it, the exact boundaries for which occasionally span multiple state-level sub-districts. To rectify this problem as much as possible, the spatial intersection (using the st_interescts predicate) between the most relevant sub-districts of the MMR and all shrids in the PCA data was computed. This, however, missed out on a few areas of interest, most notably the majority of the municipal council of Khopoli, while including a few parcels of rural land that were not relevant. The cleaned dataset contained 1273 shrids with a population totaling roughly 22.1 million - this was deemed an acceptable enough difference from the true population of 22.8 million.
 
 Another issue encountered was that the city proper was only comprised of two shrids, each spanning the Mumbai City and Mumbai Suburban districts respectively. The authors of SHRUG note this as an issue in their documentation - specifically, that breaking up census data into shrids was challenging in and around major cities given census issues - and this hampered some of the comparative analysis that was planned with regards to segregation in the city vs. the rest of the MMR.
 
@@ -83,7 +83,6 @@ tab |>
 ```
 
 Table 1 demonstrates that migration to Mumbai and the MMR has not been reflective of the broader caste population of India or of the state. This is not particularly surprising for the ST population, who primarily inhabit forested regions, but a marked difference must be noted in the SC population, who theoretically should be evenly spread out. What is notable for STs is the stark difference in population percentages between the city proper and the rest of the urban region, indicating their exclusion from the city.
-
 
 ```{r echo = FALSE, warning=FALSE, fig.size = 10}
 
@@ -135,7 +134,6 @@ tab_2 |>
   
 ```
 
-
 Table 2 shows us that lower and middle caste groups, especially OBCs, have a drastically lower ownership of firms in the city as compared to India, with a sharp difference even between Mumbai and the exurbs. This is less pronounced for SCs, but note that SCs and STs are far more disenfranchised as populations and have much lower capital ownership in general, so may not the best metric to evaluate.
 
 ```{r}
@@ -152,7 +150,6 @@ broom::tidy(spdep::geary.test((mmr_shrid_2$pc11_pca_p_sc + mmr_shrid_2$pc11_pca_
   kableExtra::kable_styling(font_size = 9)
   
 ```
-
 
 ## 3. Spatial Analysis
 
@@ -198,8 +195,8 @@ morrill_st <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = TR
 # reard measures 
 
 
-reard_st <- read_rds("reard/reard_st.rds")
-reard_sc <- read_rds("reard/reard_sc.rds")
+reard_st <- read_rds("summary_stats/reard/reard_st.rds")
+reard_sc <- read_rds("summary_stats/reard/reard_sc.rds")
 
 
 # morill_comb firm 
@@ -219,9 +216,9 @@ morrill_obc <- seg::dissim(x, df, adjust = TRUE, n2m.args = list(zero.policy = T
 
 # reard measures 
 
-reard_obc <- read_rds("reard/reard_obc.rds")
+reard_obc <- read_rds("summary_stats/reard/reard_obc.rds")
 
-reard_comb <- read_rds("reard/reard_comb.rds")
+reard_comb <- read_rds("summary_stats/reard/reard_comb.rds")
 
 
 ```
@@ -326,11 +323,11 @@ On repeated efforts, RS measures failed to compute for any of our desired second
 
 ## 4. Conclusion and Discussion
 
-This project's analysis showed less segregation for SC individuals than initially may have been expected, but still displayed convincing evidence for the segregation of STs. In a city where deforestation has accelerated significantly due to infrastructure development and new construction [@Pathak_2019; @Singh_2022], this is a particular meaningful finding, as these swamp/forested areas are historically home to Kolis, many subgroups of whom are STs. As Figure 1 displayed, a higher concentration of SC/ST are found outside the city; while a good portion of this is in forested areas, a high concentration can also be seen in the exurban centres of Badlapur/Ambarnath (far east of the city), indicating possible displacement. 
+This project's analysis showed less segregation for SC individuals than initially may have been expected, but still displayed convincing evidence for the segregation of STs. In a city where deforestation has accelerated significantly due to infrastructure development and new construction [@Pathak_2019; @Singh_2022], this is a particular meaningful finding, as these swamp/forested areas are historically home to Kolis, many subgroups of whom are STs. As Figure 1 displayed, a higher concentration of SC/ST are found outside the city; while a good portion of this is in forested areas, a high concentration can also be seen in the exurban centres of Badlapur/Ambarnath (far east of the city), indicating possible displacement.
 
 Although OBC segregation in percentages of firm ownership was seen, this was admittedly a somewhat arbitrary measure to use to analyze housing discrimination, speaking more to asset ownership patterns. Conflating OBC membership with lower/middle castes may also be a shaky assumption to make - the definition of the class has been increasingly diluted due to upper and upper-middle Hindu castes lobbying governments for their inclusion in it (e.g. to receive affirmative action benefits), such that up to 30-40% of Hindu communities fall in the class today. As such, the observed result may speak more to class-based rather than caste/religious-based segregation, somewhat outside the initial scope of the study but still a notable finding. It serves best as a standalone measure of OBC segregation compared to all other castes and has less utility to as a direct comparison to SCs or STs.
 
-Many of the limitations of this study arose from data availability and quality. The fact that the city proper only consisted of two shrids affected the ability to make accurate intra-city and city/exurb comparisons. For example, if we did have more granularity, we might have observed conglomerations of STs in areas of the city that are heavily forested like Aarey Colony, Gorai, etc. Further, with the bulk of the MMRs population in the city, more clear cut segregation of SCs may have been observed as well. Ideally, a comparison of segregation indices within the city and outside would also have been undertaken. Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. Specifically, for the set of RS measures, compositional invariance - the idea that a segregation index should return the same value regardless of the actual composition of a population by subgroup - is not met, which means that they require a uniform population distribution across space, an assumption that certainly does not hold for the MMR. This may be why we observed such low RS values at the shrid-level, compounded by the asymmetry in distribution from the 2-shrid problem. 
+Many of the limitations of this study arose from data availability and quality. The fact that the city proper only consisted of two shrids affected the ability to make accurate intra-city and city/exurb comparisons. For example, if we did have more granularity, we might have observed conglomerations of STs in areas of the city that are heavily forested like Aarey Colony, Gorai, etc. Further, with the bulk of the MMRs population in the city, more clear cut segregation of SCs may have been observed as well. Ideally, a comparison of segregation indices within the city and outside would also have been undertaken. Methodologically, we must also acknowledge that many of these measures are, relatively speaking, new in the literature and each suffers from limitations unique to them. Specifically, for the set of RS measures, compositional invariance - the idea that a segregation index should return the same value regardless of the actual composition of a population by subgroup - is not met, which means that they require a uniform population distribution across space, an assumption that certainly does not hold for the MMR. This may be why we observed such low RS values at the shrid-level, compounded by the asymmetry in distribution from the 2-shrid problem.
 
 In the future, this study could be conducted at the Ward Level, which would give us granularity for specific neighborhoods in the region that have sociological and historical value. This information was not readily available in SHRUG, but is available in raw census data if cleaned - a task like this may be more suitable for a thesis project. It would also be interesting to examine specific religions and ethnic breakdowns for a fuller picture, or better still, look at specific sub-castes and their segregation, especially with the recent groundbreaking caste surveys conducted by states like Bihar. Finally, if the 2-shrid problem was solved, re-computing RS measures would give us a better picture of the landscape of discrimination against SCs.
 
@@ -353,7 +350,7 @@ ggplot() +
                                   pc11_pca_tot_p),
   aes(fill = sc_st_prop)) +
   scale_fill_viridis_c() +
-  labs(fill = "Proportion of SC/ST residents", title = "Figure 3: Subdistrict-wise map of SC/ST populations") 
+  labs(fill = "Proportion of SC/ST residents", title = "Figure 2: Subdistrict-wise map of SC/ST populations") 
   
 ```
 
@@ -370,19 +367,17 @@ ggplot() +
 
 **Modifications to seg**: In dissim.internals, all do.call function calls called their functions with their names in quotes (i.e. "spdep::poly2nb" instead of spdep::poly2nb), which prevented dissim from working correctly. I changed this to the non-quoted version, which made the package work.
 
-
 ```{r}
-mor_test_ec <- read_rds("perm_test/mor_test_ec.rds")
-mor_test_sc <- read_rds("perm_test/mor_test_sc.rds")
-mor_test_st <- read_rds("perm_test/mor_test_st.rds")
-mor_test_sc_sub <- read_rds("perm_test/mor_test_sc_sub.rds")
-mor_test_st_sub <- read_rds("perm_test/mor_test_st_sub.rds")
-mor_test_ec_obc_sub <- read_rds("perm_test/mor_test_ec_obc_sub.rds")
-mor_test_ec_sub <- read_rds("perm_test/mor_test_ec_sub.rds")
-mor_test_ec_obc <- read_rds("perm_test/mor_test_ec_obc.rds")
+mor_test_ec <- read_rds("summary_stats/perm_test/mor_test_ec.rds")
+mor_test_sc <- read_rds("summary_stats/perm_test/mor_test_sc.rds")
+mor_test_st <- read_rds("summary_stats/perm_test/mor_test_st.rds")
+mor_test_sc_sub <- read_rds("summary_stats/perm_test/mor_test_sc_sub.rds")
+mor_test_st_sub <- read_rds("summary_stats/perm_test/mor_test_st_sub.rds")
+mor_test_ec_obc_sub <- read_rds("summary_stats/perm_test/mor_test_ec_obc_sub.rds")
+mor_test_ec_sub <- read_rds("summary_stats/perm_test/mor_test_ec_sub.rds")
+mor_test_ec_obc <- read_rds("summary_stats/perm_test/mor_test_ec_obc.rds")
 
 ```
-
 
 ```{r}
 rbind(mor_test_sc, mor_test_st, mor_test_sc_sub, mor_test_st_sub, mor_test_ec, mor_test_ec_sub, mor_test_ec_obc, mor_test_ec_obc) |>
