@@ -458,7 +458,7 @@ xtest <- OasisR::ResampleTest(df, fun ='ISMorrill', simtype = 'MonteCarlo',
 
 mor_test_ec <- xtest$Summary[1, ]
 
-mor_test_sc_sub$Var <- "SC/ST firm ownership vs. all - subdist level"
+mor_test_ec$Var <- "SC/ST firm ownership vs. all - shrid level"
 
 ```
 
