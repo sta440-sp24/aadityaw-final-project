@@ -343,6 +343,21 @@ In the future, this study could be conducted at the Ward Level, which would give
 ## Appendix
 
 ```{r}
+mmr_subdist$pc11_sd_id <- ifelse(is.na(mmr_subdist$pc11_sd_id), mmr_subdist$pc11_d_id,
+                                 mmr_subdist$pc11_sd_id)
+
+lab <- data.frame(mmr_subdist$pc11_sd_id, mmr_subdist$d_name)
+
+
+# centroid calculations
+centroids <- cbind(mmr_subdist$pc11_sd_id,
+                   as_tibble(st_coordinates(st_centroid(mmr_subdist))))
+
+centroids <- cbind(centroids, lab)
+
+names(centroids) <- c("id", "x", "y", "sd_id", "name")
+
+
 ggplot() +
   geom_sf(data = mmr_subdist |>
   # filter(shrid2 != ) |>
@@ -350,8 +365,11 @@ ggplot() +
                                   pc11_pca_tot_p),
   aes(fill = sc_st_prop)) +
   scale_fill_viridis_c() +
-  labs(fill = "Proportion of SC/ST residents", title = "Figure 2: Subdistrict-wise map of SC/ST populations") 
-  
+  labs(fill = "Proportion of SC/ST residents", 
+       title = "Figure 2: Subdistrict-wise map of SC/ST populations") +
+  with(centroids, annotate(geom="text", x = x, y = y,
+                           label=name, size=2, color = "red"))
+
 ```
 
 ```{r}
