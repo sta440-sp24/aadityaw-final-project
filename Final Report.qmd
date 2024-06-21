@@ -1,7 +1,8 @@
 ---
-title: "Housing market discrimination in the Mumbai Metropolitan Region - a spatial analysis of caste-based and religious segregation"
-author: "Aaditya Warrier"
 bibliography: references.bib
+author: Aaditya Warrier
+title: "Housing market discrimination in the Mumbai
+Metropolitan Region - a spatial analysis of caste-based and religious segregation"
 mainfont: Garamond
 monofont: Garamond
 format: 
@@ -141,8 +142,7 @@ tab_2 |>
   kable(digits = 2, col.names = c("Region", "SC (% of total firms)", 
                                   "ST (% of total firms)", 
                                   "OBC (% of total firms)"), 
-        row.names = TRUE, caption = "Firm ownership by caste/class in the MMR")  |>
-  kableExtra::kable_styling(font_size = 9)
+        row.names = TRUE, caption = "Firm ownership by caste/class in the MMR")
   
 ```
 
